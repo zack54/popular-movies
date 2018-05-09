@@ -15,20 +15,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        mRecyclerView.setLayoutManager(layoutManager);
-
+        // Setup the RecyclerView.
+        mRecyclerView = findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mRecyclerView.setHasFixedSize(true);
-
         mRecyclerViewAdapter = new RecyclerViewAdapter();
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
+        // Load the Data.
         loadData();
     }
 
+    /**
+     * This is a Helper Method
+     * Used to Start a Background Task & Get Data in the background.
+     */
     private void loadData() {
-
+        // TODO: Start a background task
     }
+
 }
