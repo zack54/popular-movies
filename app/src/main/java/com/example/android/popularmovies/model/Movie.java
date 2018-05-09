@@ -1,7 +1,5 @@
 package com.example.android.popularmovies.model;
 
-import java.util.List;
-
 public class Movie {
 
     private double mVoteAverage;

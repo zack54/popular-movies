@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,7 +19,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String BASE_URL = "http://image.tmdb.org/t/p/";
     private static final String SIZE = "w342/";
 
-    // TODO: private Movie[] mMovies = {};
+    // private Movie[] mMovies = {};
     private Movie[] mMovies = {
             new Movie(8.6,
                     "/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
