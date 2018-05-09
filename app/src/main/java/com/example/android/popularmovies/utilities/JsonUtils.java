@@ -11,7 +11,7 @@ import org.json.JSONObject;
  */
 public class JsonUtils {
 
-    public static Movie[] parseSandwichJson(String json) throws JSONException {
+    public static Movie[] parseJson(String json) throws JSONException {
 
         /* Constants - To hold the keys needed to extract the info from JSON String */
         final String MOVIE_RESULTS = "results";
@@ -22,7 +22,7 @@ public class JsonUtils {
         final String MOVIE_RELEASE_DATE = "release_date";
 
         /* Local Variable - To hold each the List of Movies */
-        Movie[] mMovies;
+        Movie[] movies;
 
         if (json == null) {
             return null;
@@ -32,7 +32,7 @@ public class JsonUtils {
 
         /* Extract List of Movies from the JSON Object */
         JSONArray resultsMovies = jsonObject.getJSONArray(MOVIE_RESULTS);
-        mMovies = new Movie[resultsMovies.length()];
+        movies = new Movie[resultsMovies.length()];
 
         for (int i = 0; i < resultsMovies.length(); i++) {
 
@@ -45,10 +45,10 @@ public class JsonUtils {
             String releaseDate = movieJSONObject.getString(MOVIE_RELEASE_DATE);
 
             /* Add a Movie Object to the List of Movies */
-            mMovies[i] = new Movie(voteAverage, posterPath, originalTitle, overview, releaseDate);
+            movies[i] = new Movie(voteAverage, posterPath, originalTitle, overview, releaseDate);
         }
 
-        return mMovies;
+        return movies;
     }
 
 }
