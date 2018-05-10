@@ -19,32 +19,45 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String BASE_URL = "http://image.tmdb.org/t/p/";
     private static final String SIZE = "w342/";
 
-    // private Movie[] mMovies = {};
-    private Movie[] mMovies = {
-            new Movie(8.6,
-                    "/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
-                    "Avengers: Infinity War",
-                    "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain.",
-                    "2018-04-25")
-    };
-
+    private Movie[] mMovies = {};
+    // Store a Reference to the External Handler
+    private final OnClickListener mClickHandler;
 
     /**
      * Creates a RecyclerViewAdapter Instance.
      */
-    public RecyclerViewAdapter() {
+    public RecyclerViewAdapter(OnClickListener clickListener) {
+        mClickHandler = clickListener;
+    }
+
+    public void setmMovies(Movie[] movies) {
+        this.mMovies = movies;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Interface Definition - it handles Click Events.
+     */
+    public interface OnClickListener {
+        void onClick(Movie currentMovie);
     }
 
     /**
      * Cache of the children views for a movie list item.
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public final ImageView mImageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.iv_poster);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mClickHandler.onClick(mMovies[getAdapterPosition()]);
         }
     }
 
@@ -69,8 +82,4 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mMovies.length;
     }
 
-    public void setmMovies(Movie[] movies) {
-        this.mMovies = movies;
-        notifyDataSetChanged();
-    }
 }

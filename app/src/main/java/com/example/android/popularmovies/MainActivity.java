@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,11 +16,10 @@ import com.example.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
-
     private String currentCriteria;
 
     @Override
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerViewAdapter = new RecyclerViewAdapter();
+        mRecyclerViewAdapter = new RecyclerViewAdapter(this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
         // Load the Data.
@@ -44,9 +44,21 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadData(String sortCriteria) {
         if (!sortCriteria.equals(currentCriteria)) {
-            new FetchTask().execute(sortCriteria);
+            currentCriteria = sortCriteria;
+            new FetchTask().execute(currentCriteria);
         }
 
+    }
+
+    @Override
+    public void onClick(Movie currentMovie) {
+        launchDetailActivity(currentMovie);
+    }
+
+    private void launchDetailActivity(Movie currentMovie) {
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+        detailIntent.putExtra("movie", currentMovie);
+        startActivity(detailIntent);
     }
 
     /**

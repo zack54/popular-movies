@@ -9,7 +9,6 @@
         android:layout_height="match_parent"
         android:layout_margin="5dp"
         android:layout_gravity="center_horizontal"
-        android:background="@android:color/darker_gray"
         android:scaleType="centerCrop" />
 
 </FrameLayout>
