@@ -11,39 +11,37 @@ import com.example.android.popularmovies.utilities.FetchImage;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private static final String IMAGE_SIZE = "w500/";
+    // TODO: UI Polish
+    // TODO: Add Up/Home Button
+    // TODO: Handle Orientation Changes(save state , different layout)
 
-    private ImageView mPoster;
-    private TextView mTitle;
-    private TextView mReleaseDate;
-    private TextView mVote;
-    private TextView mOverview;
+    private static final String IMAGE_SIZE = "w500/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        mPoster = findViewById(R.id.detail_iv_poster);
-        mTitle = findViewById(R.id.detail_tv_title);
-        mReleaseDate = findViewById(R.id.detail_tv_release_date);
-        mVote = findViewById(R.id.detail_tv_vote);
-        mOverview = findViewById(R.id.detail_tv_overview);
+        ImageView mPoster = findViewById(R.id.detail_iv_poster);
+        TextView mTitle = findViewById(R.id.detail_tv_title);
+        TextView mReleaseDate = findViewById(R.id.detail_tv_release_date);
+        TextView mVote = findViewById(R.id.detail_tv_vote);
+        TextView mOverview = findViewById(R.id.detail_tv_overview);
 
         Intent intent = getIntent();
         if (intent == null) {
             finish();
-        }
+        } else {
+            Movie movie = intent.getParcelableExtra("movie");
+            if (movie != null) {
+                String posterPath = movie.getmPosterPath();
+                FetchImage.usingPathAndSize(mPoster, posterPath, IMAGE_SIZE);
 
-
-        Movie movie = intent.getParcelableExtra("movie");
-        if (movie != null) {
-            String posterPath = movie.getmPosterPath();
-            FetchImage.usingPathAndSize(mPoster, posterPath, IMAGE_SIZE);
+                mTitle.setText(movie.getmOriginalTitle());
+                mReleaseDate.setText(movie.getmReleaseDate());
+                mVote.setText(String.valueOf(movie.getmVoteAverage()));
+                mOverview.setText(movie.getmOverview());
+            }
         }
-        mTitle.setText(movie.getmOriginalTitle());
-        mReleaseDate.setText(movie.getmReleaseDate());
-        mVote.setText(String.valueOf(movie.getmVoteAverage()));
-        mOverview.setText(movie.getmOverview());
     }
 }

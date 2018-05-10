@@ -2,7 +2,6 @@ package com.example.android.popularmovies.utilities;
 
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.RecyclerViewAdapter;
 import com.squareup.picasso.Picasso;
 
 public class FetchImage {

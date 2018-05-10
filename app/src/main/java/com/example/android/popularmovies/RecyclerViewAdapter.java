@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchImage;
-import com.squareup.picasso.Picasso;
 
 /**
  * {@link RecyclerViewAdapter} exposes a list of Movies
@@ -26,7 +25,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     /**
      * Creates a RecyclerViewAdapter Instance.
      */
-    public RecyclerViewAdapter(OnClickListener clickListener) {
+    RecyclerViewAdapter(OnClickListener clickListener) {
         mClickHandler = clickListener;
     }
 
@@ -47,9 +46,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
      */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public final ImageView mImageView;
+        final ImageView mImageView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.iv_poster);
             itemView.setOnClickListener(this);
