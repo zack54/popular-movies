@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmovies.model.Movie;
+import com.example.android.popularmovies.utilities.FetchImage;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -16,8 +17,7 @@ import com.squareup.picasso.Picasso;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private static final String BASE_URL = "http://image.tmdb.org/t/p/";
-    private static final String SIZE = "w342/";
+    private static final String IMAGE_SIZE = "w342/";
 
     private Movie[] mMovies = {};
     // Store a Reference to the External Handler
@@ -73,8 +73,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies[position];
         String posterPath = movie.getmPosterPath();
-        String fullPosterPath = BASE_URL + SIZE + posterPath;
-        Picasso.get().load(fullPosterPath).into(holder.mImageView);
+        ImageView imageView = holder.mImageView;
+        FetchImage.usingPathAndSize(imageView, posterPath, IMAGE_SIZE);
     }
 
     @Override
