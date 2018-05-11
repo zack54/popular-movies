@@ -1,8 +1,11 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,8 +14,6 @@ import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchImage;
 
 public class DetailActivity extends AppCompatActivity {
-
-    // TODO: Add Up/Home Button
 
     private static final String IMAGE_SIZE = "w500/";
 
@@ -33,19 +34,36 @@ public class DetailActivity extends AppCompatActivity {
         mVoteTextView = findViewById(R.id.detail_tv_vote);
         mOverviewTextView = findViewById(R.id.detail_tv_overview);
 
+        addUpNavigationButton();
+
         Intent intent = getIntent();
         if (intent == null) {
             closeActivityOnError();
         } else {
-
             Movie movie = intent.getParcelableExtra("movie");
-
             if (movie == null) {
                 closeActivityOnError();
             } else {
                 populateUI(movie);
-
             }
+        }
+    }
+
+    private void addUpNavigationButton() {
+        ActionBar actionBar = this.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
