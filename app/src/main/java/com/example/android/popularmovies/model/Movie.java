@@ -5,11 +5,11 @@ import android.os.Parcelable;
 
 public class Movie implements Parcelable {
 
-    private double mVoteAverage;
-    private String mPosterPath;
-    private String mOriginalTitle;
-    private String mOverview;
-    private String mReleaseDate;
+    private final double mVoteAverage;
+    private final String mPosterPath;
+    private final String mOriginalTitle;
+    private final String mOverview;
+    private final String mReleaseDate;
 
     public Movie(double mVoteAverage, String mPosterPath, String mOriginalTitle, String mOverview,
                  String mReleaseDate) {
@@ -50,7 +50,7 @@ public class Movie implements Parcelable {
         this.mReleaseDate = in.readString();
     }
 
-    // take in an input Parcel to be deserialized.
+    // take in an input Parcel to be de-serialized.
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {

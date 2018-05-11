@@ -17,11 +17,11 @@ public class DetailActivity extends AppCompatActivity {
 
     private static final String IMAGE_SIZE = "w500/";
 
-    ImageView mPosterImageView;
-    TextView mTitleTextView;
-    TextView mReleaseDateTextView;
-    TextView mVoteTextView;
-    TextView mOverviewTextView;
+    private ImageView mPosterImageView;
+    private TextView mTitleTextView;
+    private TextView mReleaseDateTextView;
+    private TextView mVoteTextView;
+    private TextView mOverviewTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

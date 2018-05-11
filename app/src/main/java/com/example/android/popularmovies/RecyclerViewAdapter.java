@@ -34,10 +34,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
-    public Movie[] getmMovies() {
-        return mMovies;
-    }
-
     /**
      * Interface Definition - it handles Click Events.
      */

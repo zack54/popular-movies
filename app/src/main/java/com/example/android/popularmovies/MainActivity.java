@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
      * A Background Task to fetch Data from the Internet.
      */
     @SuppressLint("StaticFieldLeak")
-    public class FetchTask extends AsyncTask<String, Void, Movie[]> {
+    class FetchTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
         protected void onPreExecute() {
@@ -150,21 +150,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         switch (item.getItemId()) {
             case R.id.action_popular:
-                compareSortCriteriaToLoadData(NetworkUtils.getPopularSortCriteria());
+                loadData(NetworkUtils.getPopularSortCriteria());
                 return true;
             case R.id.action_top_rated:
-                compareSortCriteriaToLoadData(NetworkUtils.getTopRatedSortCriteria());
+                loadData(NetworkUtils.getTopRatedSortCriteria());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
-    }
-
-    public void compareSortCriteriaToLoadData(String sortCriteria) {
-        if (!sortCriteria.equals(currentSortCriteria) || (mRecyclerViewAdapter.getmMovies() == null)) {
-            loadData(sortCriteria);
-        }
     }
 
     @Override
