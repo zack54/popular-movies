@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">Popular Movies</string>
 
-    <string name="error_message">
-        An error has occurred. Please try again
-    </string>
+    <string name="main_error_message">An error has occurred. Please try again</string>
+    <string name="detail_error_message">Sandwich data not available</string>
+
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>
     <string name="movie_poster">Movie Poster</string>
+    <string name="detail_description_label">Description</string>
 </resources>

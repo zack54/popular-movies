@@ -50,11 +50,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
      */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        final ImageView mImageView;
+        final ImageView posterImageView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            mImageView = itemView.findViewById(R.id.iv_poster);
+            posterImageView = itemView.findViewById(R.id.main_iv_poster);
             itemView.setOnClickListener(this);
         }
 
@@ -76,7 +76,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies[position];
         String posterPath = movie.getmPosterPath();
-        ImageView imageView = holder.mImageView;
+        ImageView imageView = holder.posterImageView;
         FetchImage.usingPathAndSize(imageView, posterPath, IMAGE_SIZE);
     }
 

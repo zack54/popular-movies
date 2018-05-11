@@ -5,43 +5,64 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchImage;
 
 public class DetailActivity extends AppCompatActivity {
 
-    // TODO: UI Polish
     // TODO: Add Up/Home Button
-    // TODO: Handle Orientation Changes(save state , different layout)
 
     private static final String IMAGE_SIZE = "w500/";
+
+    ImageView mPosterImageView;
+    TextView mTitleTextView;
+    TextView mReleaseDateTextView;
+    TextView mVoteTextView;
+    TextView mOverviewTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        ImageView mPoster = findViewById(R.id.detail_iv_poster);
-        TextView mTitle = findViewById(R.id.detail_tv_title);
-        TextView mReleaseDate = findViewById(R.id.detail_tv_release_date);
-        TextView mVote = findViewById(R.id.detail_tv_vote);
-        TextView mOverview = findViewById(R.id.detail_tv_overview);
+        mPosterImageView = findViewById(R.id.detail_iv_poster);
+        mTitleTextView = findViewById(R.id.detail_tv_title);
+        mReleaseDateTextView = findViewById(R.id.detail_tv_release_date);
+        mVoteTextView = findViewById(R.id.detail_tv_vote);
+        mOverviewTextView = findViewById(R.id.detail_tv_overview);
 
         Intent intent = getIntent();
         if (intent == null) {
-            finish();
+            closeActivityOnError();
         } else {
-            Movie movie = intent.getParcelableExtra("movie");
-            if (movie != null) {
-                String posterPath = movie.getmPosterPath();
-                FetchImage.usingPathAndSize(mPoster, posterPath, IMAGE_SIZE);
 
-                mTitle.setText(movie.getmOriginalTitle());
-                mReleaseDate.setText(movie.getmReleaseDate());
-                mVote.setText(String.valueOf(movie.getmVoteAverage()));
-                mOverview.setText(movie.getmOverview());
+            Movie movie = intent.getParcelableExtra("movie");
+
+            if (movie == null) {
+                closeActivityOnError();
+            } else {
+                populateUI(movie);
+
             }
         }
+    }
+
+    private void closeActivityOnError() {
+        finish();
+        Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void populateUI(Movie movie) {
+
+        this.setTitle(movie.getmOriginalTitle());
+        String posterPath = movie.getmPosterPath();
+        FetchImage.usingPathAndSize(mPosterImageView, posterPath, IMAGE_SIZE);
+        mTitleTextView.setText(movie.getmOriginalTitle());
+        String string = "(" + movie.getmReleaseDate() + ")";
+        mReleaseDateTextView.setText(string);
+        mVoteTextView.setText(String.valueOf(movie.getmVoteAverage()));
+        mOverviewTextView.setText(movie.getmOverview());
     }
 }
