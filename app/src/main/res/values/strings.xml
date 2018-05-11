@@ -2,7 +2,7 @@
     <string name="app_name">Popular Movies</string>
 
     <string name="error_message">
-        An error has occurred. Please try again by clicking REFRESH
+        An error has occurred. Please try again
     </string>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>

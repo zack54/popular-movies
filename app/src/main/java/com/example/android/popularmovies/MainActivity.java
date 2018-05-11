@@ -10,6 +10,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.JsonUtils;
@@ -19,20 +22,23 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
 
-    // TODO: UX Polish (ProgressBar , Error Message)
-    // TODO: Handle Orientation Changes(save state , different layout)
-
+    private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
     private String currentCriteria;
+
+    private TextView mLoadingErrorMessage;
+    private ProgressBar mLoadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Setup the RecyclerView.
-        RecyclerView mRecyclerView = findViewById(R.id.recyclerview);
+        mLoadingErrorMessage = findViewById(R.id.tv_loading_error_message);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mRecyclerView = findViewById(R.id.recyclerview);
 
+        // Setup the RecyclerView.
         GridLayoutManager gridLayoutManager = null;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, 3);
@@ -56,11 +62,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
      * Used to Start a Background Task & Get Data in the background.
      */
     private void loadData(String sortCriteria) {
-        if (!sortCriteria.equals(currentCriteria)) {
+        if (!sortCriteria.equals(currentCriteria) || (mRecyclerViewAdapter.getmMovies() == null)) {
+            mRecyclerViewAdapter.setmMovies(null);
+            showData();
             currentCriteria = sortCriteria;
             new FetchTask().execute(currentCriteria);
         }
 
+    }
+
+    private void showData() {
+        mLoadingErrorMessage.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingErrorMessage.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -79,6 +97,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
      */
     @SuppressLint("StaticFieldLeak")
     public class FetchTask extends AsyncTask<String, Void, Movie[]> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected Movie[] doInBackground(String... strings) {
@@ -103,10 +127,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         @Override
         protected void onPostExecute(Movie[] movies) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (movies != null) {
+                showData();
                 mRecyclerViewAdapter.setmMovies(movies);
             } else {
-                super.onPostExecute(null);
+                showErrorMessage();
             }
         }
     }

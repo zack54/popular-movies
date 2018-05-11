@@ -18,7 +18,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private static final String IMAGE_SIZE = "w342/";
 
-    private Movie[] mMovies = {};
+    private Movie[] mMovies;
     // Store a Reference to the External Handler
     private final OnClickListener mClickHandler;
 
@@ -32,6 +32,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void setmMovies(Movie[] movies) {
         this.mMovies = movies;
         notifyDataSetChanged();
+    }
+
+    public Movie[] getmMovies() {
+        return mMovies;
     }
 
     /**
@@ -78,7 +82,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return mMovies.length;
+        if (mMovies != null) {
+            return mMovies.length;
+        }
+        return 0;
     }
 
 }
