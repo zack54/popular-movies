@@ -24,15 +24,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
-    private String currentCriteria;
-
     private TextView mLoadingErrorMessage;
     private ProgressBar mLoadingIndicator;
+
+    private static final String CRITERIA_KEY = "criteria";
+    private String currentSortCriteria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            currentSortCriteria = savedInstanceState.getString(CRITERIA_KEY);
+        } else {
+            currentSortCriteria = NetworkUtils.getPopularSortCriteria();
+        }
 
         mLoadingErrorMessage = findViewById(R.id.tv_loading_error_message);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
@@ -47,14 +54,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             gridLayoutManager = new GridLayoutManager(this, 2);
         }
         mRecyclerView.setLayoutManager(gridLayoutManager);
-
         mRecyclerView.setHasFixedSize(true);
-
         mRecyclerViewAdapter = new RecyclerViewAdapter(this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
         // Load the Data.
-        loadData(NetworkUtils.getPopularSortCriteria());
+        loadData(currentSortCriteria);
     }
 
     /**
@@ -62,13 +67,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
      * Used to Start a Background Task & Get Data in the background.
      */
     private void loadData(String sortCriteria) {
-        if (!sortCriteria.equals(currentCriteria) || (mRecyclerViewAdapter.getmMovies() == null)) {
-            mRecyclerViewAdapter.setmMovies(null);
-            showData();
-            currentCriteria = sortCriteria;
-            new FetchTask().execute(currentCriteria);
-        }
-
+        mRecyclerViewAdapter.setmMovies(null);
+        showData();
+        currentSortCriteria = sortCriteria;
+        new FetchTask().execute(currentSortCriteria);
     }
 
     private void showData() {
@@ -148,14 +150,26 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         switch (item.getItemId()) {
             case R.id.action_popular:
-                loadData(NetworkUtils.getPopularSortCriteria());
+                compareSortCriteriaToLoadData(NetworkUtils.getPopularSortCriteria());
                 return true;
             case R.id.action_top_rated:
-                loadData(NetworkUtils.getTopRatedSortCriteria());
+                compareSortCriteriaToLoadData(NetworkUtils.getTopRatedSortCriteria());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public void compareSortCriteriaToLoadData(String sortCriteria) {
+        if (!sortCriteria.equals(currentSortCriteria) || (mRecyclerViewAdapter.getmMovies() == null)) {
+            loadData(sortCriteria);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(CRITERIA_KEY, currentSortCriteria);
+        super.onSaveInstanceState(outState);
     }
 }
