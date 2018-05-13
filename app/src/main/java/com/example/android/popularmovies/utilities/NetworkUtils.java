@@ -37,7 +37,8 @@ public final class NetworkUtils {
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_KEY_PARAM = "api_key";
 
-    private static final String KEY = "ff8bcb7ef6696d53cc8dde397d9f5368";
+    // TODO: insert an "themoviedb.org" API key.
+    private static final String KEY = "";
 
     public static String getPopularSortCriteria() {
         return POPULAR_SORT_CRITERIA;
