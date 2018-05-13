@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2018. Issam ELouaaer
+ *
+ * Licensed under the  GNU GENERAL PUBLIC  License, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.gnu.org/licenses/gpl.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.example.android.popularmovies;
 
 import android.support.annotation.NonNull;
@@ -11,55 +28,37 @@ import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchImage;
 
 /**
- * {@link RecyclerViewAdapter} exposes a list of Movies
+ * {@link RecyclerViewAdapter} exposes a list of Movies.
  * {@link android.support.v7.widget.RecyclerView}
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private static final String IMAGE_SIZE = "w342/";
 
-    private Movie[] mMovies;
-    // Store a Reference to the External Handler
+    // Member Variable - Stores a Reference to the Click Events External Handler.
     private final OnClickListener mClickHandler;
 
+    // Member Variable - Stores the Movies Data Source.
+    private Movie[] mMovies;
+
     /**
-     * Creates a RecyclerViewAdapter Instance.
+     * Constructor - Initializes the Click Events External Handler.
      */
     RecyclerViewAdapter(OnClickListener clickListener) {
         mClickHandler = clickListener;
     }
 
+    /**
+     * Sets the Movies Data Source & Notifies the Adapter that Data has changed.
+     */
     public void setmMovies(Movie[] movies) {
         this.mMovies = movies;
         notifyDataSetChanged();
     }
 
     /**
-     * Interface Definition - it handles Click Events.
+     * Initializes a ViewHolder using the Item's "XML" Layout.
      */
-    public interface OnClickListener {
-        void onClick(Movie currentMovie);
-    }
-
-    /**
-     * Cache of the children views for a movie list item.
-     */
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        final ImageView posterImageView;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            posterImageView = itemView.findViewById(R.id.main_iv_poster);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            mClickHandler.onClick(mMovies[getAdapterPosition()]);
-        }
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -68,20 +67,54 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return new ViewHolder(view);
     }
 
+    /**
+     * Populates & Binds a ViewHolder with the correct Movie's Image.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies[position];
         String posterPath = movie.getmPosterPath();
         ImageView imageView = holder.posterImageView;
-        FetchImage.usingPathAndSize(imageView, posterPath, IMAGE_SIZE);
+        FetchImage.usingRelativePathAndSize(imageView, posterPath, IMAGE_SIZE);
     }
 
+    /**
+     * Returns the Total Number of Movies.
+     */
     @Override
     public int getItemCount() {
         if (mMovies != null) {
             return mMovies.length;
         }
         return 0;
+    }
+
+    /**
+     * Interface Definition - should be implemented by external component to handles Click Events.
+     */
+    public interface OnClickListener {
+        void onClick(Movie currentMovie);
+    }
+
+    /**
+     * Caches Views for Movies item to be reused when needed.
+     */
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        // Holds references to Sub-View within a List Item View.
+        final ImageView posterImageView;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            posterImageView = itemView.findViewById(R.id.main_iv_poster);
+            itemView.setOnClickListener(this);
+        }
+
+        // Passes the current clicked movie to the External Clicks handler.
+        @Override
+        public void onClick(View v) {
+            mClickHandler.onClick(mMovies[getAdapterPosition()]);
+        }
     }
 
 }

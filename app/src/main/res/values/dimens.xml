@@ -15,7 +15,12 @@
   ~
   -->
 
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-</adaptive-icon>
+<resources>
+    <dimen name="detail_movie_poster">300dp</dimen>
+    <dimen name="view_padding">16dp</dimen>
+    <dimen name="detail_release_date_margin">5dp</dimen>
+    <dimen name="detail_vote_icon_size">18dp</dimen>
+    <dimen name="text_size">20sp</dimen>
+    <dimen name="progress_bar_size">42dp</dimen>
+    <dimen name="grid_views_margin">5dp</dimen>
+</resources>
