@@ -18,8 +18,11 @@
 package com.example.android.popularmovies;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
     // Member Variables - Used to make UX better.
+    private TextView mInternetConnectionErrorMessage;
     private TextView mLoadingErrorMessage;
     private ProgressBar mLoadingIndicator;
 
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
 
         // Connects member variables to views in the main activity layout.
+        mInternetConnectionErrorMessage = findViewById(R.id.tv_internet_connection_error_message);
         mLoadingErrorMessage = findViewById(R.id.tv_loading_error_message);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         mRecyclerView = findViewById(R.id.recycler_view);
@@ -92,26 +97,55 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
      * Helper Method - Starts a Background Task & Get Data based on Sort Criteria in the background.
      */
     private void loadData(String sortCriteria) {
-        mRecyclerViewAdapter.setmMovies(null);
-        showData();
-        currentSortCriteria = sortCriteria;
-        new FetchTask().execute(currentSortCriteria);
+        if (connectedToInternet()) {
+            mRecyclerViewAdapter.setmMovies(null);
+            showData();
+            currentSortCriteria = sortCriteria;
+            new FetchTask().execute(currentSortCriteria);
+        } else {
+            showInternetConnectionErrorMessage();
+        }
     }
 
     /**
-     * Helper Method - Makes the Movies Data visible & Hides the Error Message.
+     * Helper Method - Checks for internet connection before making the actual request to the API.
+     * So the device can save one unneeded network call.
+     */
+    private boolean connectedToInternet() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+        return ((networkInfo != null) && (networkInfo.isConnectedOrConnecting()));
+    }
+
+    /**
+     * Helper Method - Makes the Movies Data visible & Hides the Error Messages.
      */
     private void showData() {
+        mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     /**
-     * Helper Method - Makes the Error Message visible & Hides the Movies Data.
+     * Helper Method - Makes Loading Error Message visible & Hides Movies Data and Connection Error.
      */
-    private void showErrorMessage() {
+    private void showLoadingErrorMessage() {
+        mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
+     */
+    private void showInternetConnectionErrorMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingErrorMessage.setVisibility(View.INVISIBLE);
+        mInternetConnectionErrorMessage.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -204,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 showData();
                 mRecyclerViewAdapter.setmMovies(movies);
             } else {
-                showErrorMessage();
+                showLoadingErrorMessage();
             }
         }
     }
