@@ -19,6 +19,8 @@ package com.example.android.popularmovies.utilities;
 
 import android.net.Uri;
 
+import com.example.android.popularmovies.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -36,9 +38,7 @@ public final class NetworkUtils {
     private static final String TOP_RATED_SORT_CRITERIA = "top_rated";
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_KEY_PARAM = "api_key";
-
-    // TODO: insert an "themoviedb.org" API key.
-    private static final String KEY = "ff8bcb7ef6696d53cc8dde397d9f5368";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     public static String getPopularSortCriteria() {
         return POPULAR_SORT_CRITERIA;
@@ -64,7 +64,7 @@ public final class NetworkUtils {
         }
 
         Uri uri = Uri.parse(stringUri).buildUpon()
-                .appendQueryParameter(API_KEY_PARAM, KEY)
+                .appendQueryParameter(API_KEY_PARAM, API_KEY)
                 .build();
 
         URL url = null;
