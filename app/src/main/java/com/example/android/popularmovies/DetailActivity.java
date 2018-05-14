@@ -30,6 +30,9 @@ import android.widget.Toast;
 import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchImages;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Displays details about each Movie.
  */
@@ -39,10 +42,15 @@ public class DetailActivity extends AppCompatActivity {
     private static final String IMAGE_SIZE = "w500/";
 
     // Member Variables - Holds references to the Views in Detail Activity Layout.
+    @BindView(R.id.detail_iv_poster)
     private ImageView mPosterImageView;
+    @BindView(R.id.detail_tv_title)
     private TextView mTitleTextView;
+    @BindView(R.id.detail_tv_release_date)
     private TextView mReleaseDateTextView;
+    @BindView(R.id.detail_tv_vote)
     private TextView mVoteTextView;
+    @BindView(R.id.detail_tv_overview)
     private TextView mOverviewTextView;
 
     @Override
@@ -51,11 +59,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         // Connects member variables to views in the detail activity layout.
-        mPosterImageView = findViewById(R.id.detail_iv_poster);
-        mTitleTextView = findViewById(R.id.detail_tv_title);
-        mReleaseDateTextView = findViewById(R.id.detail_tv_release_date);
-        mVoteTextView = findViewById(R.id.detail_tv_vote);
-        mOverviewTextView = findViewById(R.id.detail_tv_overview);
+        ButterKnife.bind(this);
 
         // Adds Up Navigation Button into the Action Bar.
         addUpNavigationButton();
@@ -74,9 +78,7 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Helper Method - Shows the Up Navigation as an action button in the Action Bar.
-     */
+    // Helper Method - Shows the Up Navigation as an action button in the Action Bar.
     private void addUpNavigationButton() {
         ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
@@ -84,17 +86,13 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Helper Method - Finishes the detail activity.
-     */
+    // Helper Method - Finishes the detail activity.
     private void closeActivityOnError() {
         finish();
         Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * Helper Method - Populates the detail activity's views with the movie's properties.
-     */
+    // Helper Method - Populates the detail activity's views with the movie's properties.
     private void populateUI(Movie movie) {
         this.setTitle(movie.getmOriginalTitle());
         String posterPath = movie.getmPosterPath();
@@ -106,9 +104,7 @@ public class DetailActivity extends AppCompatActivity {
         mOverviewTextView.setText(movie.getmOverview());
     }
 
-    /**
-     * Navigates the Main Activity when Up Button is clicked.
-     */
+    // Navigates the Main Activity when Up Button is clicked.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

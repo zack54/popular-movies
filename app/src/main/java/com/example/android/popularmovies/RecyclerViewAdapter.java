@@ -41,24 +41,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // Member Variable - Stores the Movies Data Source.
     private Movie[] mMovies;
 
-    /**
-     * Constructor - Initializes the Click Events External Handler.
-     */
+    // Constructor - Initializes the Click Events External Handler.
     RecyclerViewAdapter(OnClickListener clickListener) {
         mClickHandler = clickListener;
     }
 
-    /**
-     * Sets the Movies Data Source & Notifies the Adapter that Data has changed.
-     */
+    // Sets the Movies Data Source & Notifies the Adapter that Data has changed.
     public void setmMovies(Movie[] movies) {
         this.mMovies = movies;
         notifyDataSetChanged();
     }
 
-    /**
-     * Initializes a ViewHolder using the Item's "XML" Layout.
-     */
+    // Initializes a ViewHolder using the Item's "XML" Layout.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -67,9 +61,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return new ViewHolder(view);
     }
 
-    /**
-     * Populates & Binds a ViewHolder with the correct Movie's Image.
-     */
+    // Populates & Binds a ViewHolder with the correct Movie's Image.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies[position];
@@ -78,9 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         FetchImages.usingRelativePathAndSize(imageView, posterPath, IMAGE_SIZE);
     }
 
-    /**
-     * Returns the Total Number of Movies.
-     */
+    // Returns the Total Number of Movies.
     @Override
     public int getItemCount() {
         if (mMovies != null) {
@@ -89,16 +79,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return 0;
     }
 
-    /**
-     * Interface Definition - should be implemented by external component to handles Click Events.
-     */
+    // Interface Definition - should be implemented by external component to handles Click Events.
     public interface OnClickListener {
         void onClick(Movie currentMovie);
     }
 
-    /**
-     * Caches Views for Movies item to be reused when needed.
-     */
+    // Caches Views for Movies item to be reused when needed.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // Holds references to Sub-View within a List Item View.

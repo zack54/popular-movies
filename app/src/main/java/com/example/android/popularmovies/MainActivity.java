@@ -36,6 +36,9 @@ import com.example.android.popularmovies.model.Movie;
 import com.example.android.popularmovies.utilities.FetchDataTask;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Displays a grid of Movie Posters.
  * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
@@ -44,12 +47,17 @@ import com.example.android.popularmovies.utilities.NetworkUtils;
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener, FetchDataTask.OnTaskCompleteListener<Movie[]> {
 
     private static final String CRITERIA_KEY = "criteria";
+
+    @BindView(R.id.recycler_view)
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
     // Member Variables - Used to make UX better.
+    @BindView(R.id.tv_connection_error_message)
     private TextView mInternetConnectionErrorMessage;
+    @BindView(R.id.tv_loading_error_message)
     private TextView mLoadingErrorMessage;
+    @BindView(R.id.pb_loading_indicator)
     private ProgressBar mLoadingIndicator;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
@@ -61,10 +69,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
 
         // Connects member variables to views in the main activity layout.
-        mInternetConnectionErrorMessage = findViewById(R.id.tv_internet_connection_error_message);
-        mLoadingErrorMessage = findViewById(R.id.tv_loading_error_message);
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
-        mRecyclerView = findViewById(R.id.recycler_view);
+        ButterKnife.bind(this);
 
         // Setups the RecyclerView.
         GridLayoutManager gridLayoutManager = null;

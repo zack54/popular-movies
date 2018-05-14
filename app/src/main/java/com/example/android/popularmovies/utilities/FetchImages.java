@@ -26,14 +26,10 @@ import com.squareup.picasso.Picasso;
  */
 public class FetchImages {
 
-    /**
-     * Constant - Holds the Images' base url.
-     */
+    // Constant - Holds the Images' base url.
     private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
 
-    /**
-     * Fetches & Loads an Image into an ImageView.
-     */
+    // Fetches & Loads an Image into an ImageView.
     public static void usingRelativePathAndSize(ImageView imageView, String relativePath,
                                                 String size) {
         String fullImagePath = IMAGE_BASE_URL + size + relativePath;

@@ -23,7 +23,10 @@ import com.example.android.popularmovies.model.Movie;
 
 import java.net.URL;
 
-// A Separate Background Task to fetch Data from the Internet - Makes the Code more maintainable.
+/**
+ * A Separate Background Task to fetch Data from the Internet.
+ * Makes the Code more maintainable.
+ */
 public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
 
     // Member Variable - Holds a reference to the External Handler.
