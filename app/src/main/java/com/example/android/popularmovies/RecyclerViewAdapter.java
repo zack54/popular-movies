@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmovies.model.Movie;
-import com.example.android.popularmovies.utilities.FetchImage;
+import com.example.android.popularmovies.utilities.FetchImages;
 
 /**
  * {@link RecyclerViewAdapter} exposes a list of Movies.
@@ -75,7 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Movie movie = mMovies[position];
         String posterPath = movie.getmPosterPath();
         ImageView imageView = holder.posterImageView;
-        FetchImage.usingRelativePathAndSize(imageView, posterPath, IMAGE_SIZE);
+        FetchImages.usingRelativePathAndSize(imageView, posterPath, IMAGE_SIZE);
     }
 
     /**

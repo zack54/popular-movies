@@ -26,7 +26,7 @@ import org.json.JSONObject;
 /**
  * Utility functions - Handles JSON data.
  */
-public class JsonUtils {
+class JsonUtils {
 
     /**
      * Parses JSON String and returns an Array of Movies.

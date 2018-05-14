@@ -17,13 +17,11 @@
 
 package com.example.android.popularmovies;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -35,16 +33,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.model.Movie;
-import com.example.android.popularmovies.utilities.JsonUtils;
+import com.example.android.popularmovies.utilities.FetchDataTask;
 import com.example.android.popularmovies.utilities.NetworkUtils;
-
-import java.net.URL;
 
 /**
  * Displays a grid of Movie Posters.
  * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
+ * Implements FetchDataTask.OnTaskCompleteListener - so it can be invoked after AsyncTask Completed.
  */
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener, FetchDataTask.OnTaskCompleteListener<Movie[]> {
 
     private static final String CRITERIA_KEY = "criteria";
     private RecyclerView mRecyclerView;
@@ -93,24 +90,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         loadData(currentSortCriteria);
     }
 
-    /**
-     * Helper Method - Starts a Background Task & Get Data based on Sort Criteria in the background.
-     */
+    // Helper Method - Starts Background Task based on Sort Criteria if there is Internet connection
     private void loadData(String sortCriteria) {
         if (connectedToInternet()) {
             mRecyclerViewAdapter.setmMovies(null);
             showData();
             currentSortCriteria = sortCriteria;
-            new FetchTask().execute(currentSortCriteria);
+            new FetchDataTask(this).execute(currentSortCriteria);
         } else {
             showInternetConnectionErrorMessage();
         }
     }
 
-    /**
-     * Helper Method - Checks for internet connection before making the actual request to the API.
-     * So the device can save one unneeded network call.
-     */
+    // Helper Method - Checks Internet Connection so the device can save one unneeded network call.
     private boolean connectedToInternet() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -121,38 +113,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         return ((networkInfo != null) && (networkInfo.isConnectedOrConnecting()));
     }
 
-    /**
-     * Helper Method - Makes the Movies Data visible & Hides the Error Messages.
-     */
+    // Helper Method - Makes the Movies Data visible & Hides the Error Messages.
     private void showData() {
         mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Helper Method - Makes Loading Error Message visible & Hides Movies Data and Connection Error.
-     */
+    // Helper Method - Makes Loading Error Message visible & Hides Movies Data and Connection Error.
     private void showLoadingErrorMessage() {
         mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
-     */
+    // Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
     private void showInternetConnectionErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mInternetConnectionErrorMessage.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Handles RecyclerView items Clicks - Launches the detail activity for the correct Movie.
-     *
-     * @param currentMovie The Movie that was clicked.
-     */
+    // Handles RecyclerView items Clicks - Launches the detail activity for the correct Movie.
     @Override
     public void onClick(Movie currentMovie) {
         Intent detailIntent = new Intent(this, DetailActivity.class);
@@ -160,18 +142,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         startActivity(detailIntent);
     }
 
-    /**
-     * Adds an Options Menu to Main Activity.
-     */
+    // Adds an Options Menu to Main Activity.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sort_menu, menu);
         return true;
     }
 
-    /**
-     * Handles Options Menu Items Clicks - Load Data with correct Sort Criteria.
-     */
+    // Handles Options Menu Items Clicks - Load Data with correct Sort Criteria.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -186,60 +164,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
     }
 
-    /**
-     * Saves the state of main activity before orientation.
-     */
+    // Saves the state of main activity before orientation.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(CRITERIA_KEY, currentSortCriteria);
         super.onSaveInstanceState(outState);
     }
 
-    /**
-     * A Background Task to fetch Data from the Internet.
-     */
-    @SuppressLint("StaticFieldLeak")
-    class FetchTask extends AsyncTask<String, Void, Movie[]> {
+    // Prepares the UI Before Network Starts.
+    @Override
+    public void onTaskStart() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
 
-        // Prepares the UI Before Network Starts.
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        // Starts Connection & Parse Response.
-        @Override
-        protected Movie[] doInBackground(String... strings) {
-
-            // If there's no sort criteria, there's nothing to look up.
-            if (strings.length == 0) {
-                return null;
-            }
-
-            String sortCriteria = strings[0];
-            URL url = NetworkUtils.buildUrl(sortCriteria);
-
-            try {
-                String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
-                return JsonUtils.parseJson(jsonString);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        // Updates the UI with the Result Value.
-        @Override
-        protected void onPostExecute(Movie[] movies) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (movies != null) {
-                showData();
-                mRecyclerViewAdapter.setmMovies(movies);
-            } else {
-                showLoadingErrorMessage();
-            }
+    // Updates the UI with the Result after Network has Completed.
+    @Override
+    public void onTaskComplete(Movie[] movies) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (movies != null) {
+            showData();
+            mRecyclerViewAdapter.setmMovies(movies);
+        } else {
+            showLoadingErrorMessage();
         }
     }
 }

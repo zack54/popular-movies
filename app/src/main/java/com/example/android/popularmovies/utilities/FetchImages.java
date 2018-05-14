@@ -24,7 +24,7 @@ import com.squareup.picasso.Picasso;
 /**
  * Utility functions - Handles loading & caching images.
  */
-public class FetchImage {
+public class FetchImages {
 
     /**
      * Constant - Holds the Images' base url.

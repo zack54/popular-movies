@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.model.Movie;
-import com.example.android.popularmovies.utilities.FetchImage;
+import com.example.android.popularmovies.utilities.FetchImages;
 
 /**
  * Displays details about each Movie.
@@ -98,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
     private void populateUI(Movie movie) {
         this.setTitle(movie.getmOriginalTitle());
         String posterPath = movie.getmPosterPath();
-        FetchImage.usingRelativePathAndSize(mPosterImageView, posterPath, IMAGE_SIZE);
+        FetchImages.usingRelativePathAndSize(mPosterImageView, posterPath, IMAGE_SIZE);
         mTitleTextView.setText(movie.getmOriginalTitle());
         String string = "(" + movie.getmReleaseDate() + ")";
         mReleaseDateTextView.setText(string);
