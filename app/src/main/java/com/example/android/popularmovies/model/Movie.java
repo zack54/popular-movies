@@ -56,7 +56,7 @@ public class Movie implements Parcelable {
         this.mReleaseDate = mReleaseDate;
     }
 
-    // Public Constructor - De-Serializes the Parcel object & Reconstructs the original Properties.
+    // Private Constructor - De-Serializes the Parcel object & Reconstructs the original Properties.
     private Movie(Parcel in) {
         this.mVoteAverage = in.readDouble();
         this.mPosterPath = in.readString();
@@ -85,12 +85,6 @@ public class Movie implements Parcelable {
         return mReleaseDate;
     }
 
-    // Sets a Flag indicating special data types.
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
     // Serializes the Movie Object - Stores the Movie's Properties to a Parcel Object.
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -99,6 +93,12 @@ public class Movie implements Parcelable {
         dest.writeString(mOriginalTitle);
         dest.writeString(mOverview);
         dest.writeString(mReleaseDate);
+    }
+
+    // Sets a Flag indicating special data types.
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
 }

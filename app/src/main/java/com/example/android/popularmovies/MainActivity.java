@@ -42,9 +42,10 @@ import butterknife.ButterKnife;
 /**
  * Displays a grid of Movie Posters.
  * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
- * Implements FetchDataTask.OnTaskCompleteListener - so it can be invoked after AsyncTask Completed.
+ * Implements FetchDataTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed.
  */
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener, FetchDataTask.OnTaskCompleteListener<Movie[]> {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener,
+        FetchDataTask.OnFetchDataTaskListener<Movie[]> {
 
     private static final String CRITERIA_KEY = "criteria";
 
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             currentSortCriteria = sortCriteria;
             new FetchDataTask(this).execute(currentSortCriteria);
         } else {
-            showInternetConnectionErrorMessage();
+            showConnectionErrorMessage();
         }
     }
 
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     // Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
-    private void showInternetConnectionErrorMessage() {
+    private void showConnectionErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mInternetConnectionErrorMessage.setVisibility(View.VISIBLE);

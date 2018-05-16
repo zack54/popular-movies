@@ -30,15 +30,15 @@ import java.net.URL;
 public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
 
     // Member Variable - Holds a reference to the External Handler.
-    private final OnTaskCompleteListener<Movie[]> mTaskCompleteListener;
+    private final OnFetchDataTaskListener<Movie[]> mFetchDataTaskListener;
 
     // Public Constructor - Sets the External Handler.
-    public FetchDataTask(OnTaskCompleteListener<Movie[]> taskCompleteListener) {
-        this.mTaskCompleteListener = taskCompleteListener;
+    public FetchDataTask(OnFetchDataTaskListener<Movie[]> fetchDataTaskListener) {
+        this.mFetchDataTaskListener = fetchDataTaskListener;
     }
 
     // Interface Definition - Should be implemented by an External Listener.
-    public interface OnTaskCompleteListener<T> {
+    public interface OnFetchDataTaskListener<T> {
         void onTaskStart();
 
         void onTaskComplete(T movies);
@@ -48,7 +48,7 @@ public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mTaskCompleteListener.onTaskStart();
+        mFetchDataTaskListener.onTaskStart();
     }
 
     // Starts Connection & Parse Response.
@@ -76,6 +76,6 @@ public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
     // Invokes the External Handler after the AsyncTask has completed.
     @Override
     protected void onPostExecute(Movie[] movies) {
-        mTaskCompleteListener.onTaskComplete(movies);
+        mFetchDataTaskListener.onTaskComplete(movies);
     }
 }
