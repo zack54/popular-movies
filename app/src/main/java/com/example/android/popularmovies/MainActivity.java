@@ -42,7 +42,7 @@ import butterknife.ButterKnife;
 /**
  * Displays a grid of Movie Posters.
  * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
- * Implements FetchDataTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed.
+ * Implements FetchDataTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener,
         FetchDataTask.OnFetchDataTaskListener<Movie[]> {
@@ -50,16 +50,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private static final String CRITERIA_KEY = "criteria";
 
     @BindView(R.id.recycler_view)
-    private RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
     // Member Variables - Used to make UX better.
     @BindView(R.id.tv_connection_error_message)
-    private TextView mInternetConnectionErrorMessage;
+    TextView mInternetConnectionErrorMessage;
     @BindView(R.id.tv_loading_error_message)
-    private TextView mLoadingErrorMessage;
+    TextView mLoadingErrorMessage;
     @BindView(R.id.pb_loading_indicator)
-    private ProgressBar mLoadingIndicator;
+    ProgressBar mLoadingIndicator;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
     private String currentSortCriteria;

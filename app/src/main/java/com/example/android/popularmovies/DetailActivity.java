@@ -43,15 +43,15 @@ public class DetailActivity extends AppCompatActivity {
 
     // Member Variables - Holds references to the Views in Detail Activity Layout.
     @BindView(R.id.detail_iv_poster)
-    private ImageView mPosterImageView;
+    ImageView mPosterImageView;
     @BindView(R.id.detail_tv_title)
-    private TextView mTitleTextView;
+    TextView mTitleTextView;
     @BindView(R.id.detail_tv_release_date)
-    private TextView mReleaseDateTextView;
+    TextView mReleaseDateTextView;
     @BindView(R.id.detail_tv_vote)
-    private TextView mVoteTextView;
+    TextView mVoteTextView;
     @BindView(R.id.detail_tv_overview)
-    private TextView mOverviewTextView;
+    TextView mOverviewTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
