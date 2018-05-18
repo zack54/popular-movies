@@ -22,6 +22,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -33,7 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.model.Movie;
-import com.example.android.popularmovies.utilities.FetchDataTask;
+import com.example.android.popularmovies.utilities.FetchDataLoader;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
 import butterknife.BindView;
@@ -45,8 +49,9 @@ import butterknife.ButterKnife;
  * Implements FetchDataTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener,
-        FetchDataTask.OnFetchDataTaskListener<Movie[]> {
+        LoaderManager.LoaderCallbacks<Movie[]> {
 
+    private static final int FETCH_DATA_LOADER_ID = 0;
     private static final String CRITERIA_KEY = "criteria";
 
     @BindView(R.id.recycler_view)
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     ProgressBar mLoadingIndicator;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
-    private String currentSortCriteria;
+    private String mCurrentSortCriteria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,22 +92,34 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         // Restores the state of main activity on orientation.
         if (savedInstanceState != null) {
-            currentSortCriteria = savedInstanceState.getString(CRITERIA_KEY);
+            mCurrentSortCriteria = savedInstanceState.getString(CRITERIA_KEY);
         } else {
-            currentSortCriteria = NetworkUtils.getPopularSortCriteria();
+            mCurrentSortCriteria = NetworkUtils.getPopularSortCriteria();
         }
 
         // Load the Data.
-        loadData(currentSortCriteria);
+        loadData(mCurrentSortCriteria);
     }
 
     // Helper Method - Starts Background Task based on Sort Criteria if there is Internet connection
     private void loadData(String sortCriteria) {
         if (connectedToInternet()) {
-            mRecyclerViewAdapter.setmMovies(null);
-            showData();
-            currentSortCriteria = sortCriteria;
-            new FetchDataTask(this).execute(currentSortCriteria);
+
+            onLoadStarted();
+
+            Bundle bundle = new Bundle();
+            bundle.putString(CRITERIA_KEY, sortCriteria);
+
+            // If the sort Criteria is different than the current criteria, then Reset the Loader
+            // Otherwise use the Loader's cashed Data.
+            if (!mCurrentSortCriteria.equals(sortCriteria)) {
+                getSupportLoaderManager().restartLoader(FETCH_DATA_LOADER_ID, bundle, this);
+            } else {
+                getSupportLoaderManager().initLoader(FETCH_DATA_LOADER_ID, bundle, this);
+            }
+
+            mCurrentSortCriteria = sortCriteria;
+
         } else {
             showConnectionErrorMessage();
         }
@@ -173,25 +190,41 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     // Saves the state of main activity before orientation.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(CRITERIA_KEY, currentSortCriteria);
+        outState.putString(CRITERIA_KEY, mCurrentSortCriteria);
         super.onSaveInstanceState(outState);
     }
 
     // Prepares the UI Before Network Starts.
-    @Override
-    public void onTaskStart() {
+    public void onLoadStarted() {
+        mRecyclerViewAdapter.setmMovies(null);
+        showData();
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    // Updates the UI with the Result after Network has Completed.
+
+    // Instantiates a New Loader for given ID.
+    @NonNull
     @Override
-    public void onTaskComplete(Movie[] movies) {
+    public Loader<Movie[]> onCreateLoader(int id, @Nullable Bundle args) {
+        assert args != null;
+        return new FetchDataLoader(this, args.getString(CRITERIA_KEY));
+    }
+
+    // Updates the UI with the Loader Results after Network has Completed.
+    @Override
+    public void onLoadFinished(@NonNull Loader<Movie[]> loader, Movie[] data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (movies != null) {
+        if (data != null) {
             showData();
-            mRecyclerViewAdapter.setmMovies(movies);
+            mRecyclerViewAdapter.setmMovies(data);
         } else {
             showLoadingErrorMessage();
         }
+    }
+
+    // Resets the Loader - Clears any References to Loader's Data.
+    @Override
+    public void onLoaderReset(@NonNull Loader<Movie[]> loader) {
+        mRecyclerViewAdapter.setmMovies(null);
     }
 }
