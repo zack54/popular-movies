@@ -24,6 +24,10 @@ import com.example.android.popularmovies.model.Movie;
 
 import java.net.URL;
 
+/**
+ * A Separate Background Task to fetch Data from the Internet.
+ * Makes the Code more maintainable.
+ */
 public class FetchDataLoader extends AsyncTaskLoader<Movie[]> {
 
     // Member Variable - Holds & Caches the Result of the load.
