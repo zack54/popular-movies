@@ -36,7 +36,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.model.Movie;
+import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.utilities.FetchDataLoader;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
@@ -46,7 +46,7 @@ import butterknife.ButterKnife;
 /**
  * Displays a grid of Movie Posters.
  * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
- * Implements FetchDataTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
+ * Implements FetchDataAsyncTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener,
         LoaderManager.LoaderCallbacks<Movie[]> {
@@ -78,6 +78,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         ButterKnife.bind(this);
 
         // Setups the RecyclerView.
+        mSetupRecyclerView();
+
+        // Restore the Activity's State
+        mRestoreInstanceState(savedInstanceState);
+
+        // Load the Data.
+        mLoadData(mCurrentSortCriteria);
+    }
+
+    // Helper Method - Setups the RecyclerView's LayoutManager based on current Orientation.
+    private void mSetupRecyclerView() {
         GridLayoutManager gridLayoutManager = null;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, 3);
@@ -89,24 +100,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         mRecyclerView.setHasFixedSize(true);
         mRecyclerViewAdapter = new RecyclerViewAdapter(this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
+    }
 
-        // Restores the state of main activity on orientation.
+    // Helper Method - Restores the state of main activity on orientation.
+    private void mRestoreInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mCurrentSortCriteria = savedInstanceState.getString(CRITERIA_KEY);
         } else {
             mCurrentSortCriteria = NetworkUtils.getPopularSortCriteria();
         }
-
-        // Load the Data.
-        loadData(mCurrentSortCriteria);
     }
 
     // Helper Method - Starts Background Task based on Sort Criteria if there is Internet connection
-    private void loadData(String sortCriteria) {
-        if (connectedToInternet()) {
+    private void mLoadData(String sortCriteria) {
+        if (mConnectedToInternet()) {
 
-            onLoadStarted();
-
+            // Prepares the UI Before Network Starts.
+            mOnLoadStarted();
             Bundle bundle = new Bundle();
             bundle.putString(CRITERIA_KEY, sortCriteria);
 
@@ -117,16 +127,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             } else {
                 getSupportLoaderManager().initLoader(FETCH_DATA_LOADER_ID, bundle, this);
             }
-
             mCurrentSortCriteria = sortCriteria;
-
         } else {
-            showConnectionErrorMessage();
+            mShowConnectionErrorMessage();
         }
     }
 
     // Helper Method - Checks Internet Connection so the device can save one unneeded network call.
-    private boolean connectedToInternet() {
+    private boolean mConnectedToInternet() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = null;
@@ -137,21 +145,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     // Helper Method - Makes the Movies Data visible & Hides the Error Messages.
-    private void showData() {
+    private void mShowData() {
         mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     // Helper Method - Makes Loading Error Message visible & Hides Movies Data and Connection Error.
-    private void showLoadingErrorMessage() {
+    private void mShowLoadingErrorMessage() {
         mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.VISIBLE);
     }
 
     // Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
-    private void showConnectionErrorMessage() {
+    private void mShowConnectionErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingErrorMessage.setVisibility(View.INVISIBLE);
         mInternetConnectionErrorMessage.setVisibility(View.VISIBLE);
@@ -177,10 +185,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_popular:
-                loadData(NetworkUtils.getPopularSortCriteria());
+                mLoadData(NetworkUtils.getPopularSortCriteria());
                 return true;
             case R.id.action_top_rated:
-                loadData(NetworkUtils.getTopRatedSortCriteria());
+                mLoadData(NetworkUtils.getTopRatedSortCriteria());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,12 +203,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     // Prepares the UI Before Network Starts.
-    public void onLoadStarted() {
+    public void mOnLoadStarted() {
         mRecyclerViewAdapter.setmMovies(null);
-        showData();
+        mShowData();
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
-
 
     // Instantiates a New Loader for given ID.
     @NonNull
@@ -215,10 +222,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     public void onLoadFinished(@NonNull Loader<Movie[]> loader, Movie[] data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
-            showData();
+            mShowData();
             mRecyclerViewAdapter.setmMovies(data);
         } else {
-            showLoadingErrorMessage();
+            mShowLoadingErrorMessage();
         }
     }
 

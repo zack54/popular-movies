@@ -20,7 +20,7 @@ package com.example.android.popularmovies.utilities;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.example.android.popularmovies.model.Movie;
+import com.example.android.popularmovies.data.Movie;
 
 import java.net.URL;
 

@@ -19,7 +19,7 @@ package com.example.android.popularmovies.utilities;
 
 import android.os.AsyncTask;
 
-import com.example.android.popularmovies.model.Movie;
+import com.example.android.popularmovies.data.Movie;
 
 import java.net.URL;
 
@@ -27,13 +27,13 @@ import java.net.URL;
  * A Separate Background Task to fetch Data from the Internet.
  * Makes the Code more maintainable.
  */
-public class FetchDataTask extends AsyncTask<String, Void, Movie[]> {
+public class FetchDataAsyncTask extends AsyncTask<String, Void, Movie[]> {
 
     // Member Variable - Holds a reference to the External Handler.
     private final OnFetchDataTaskListener<Movie[]> mFetchDataTaskListener;
 
     // Public Constructor - Sets the External Handler.
-    public FetchDataTask(OnFetchDataTaskListener<Movie[]> fetchDataTaskListener) {
+    public FetchDataAsyncTask(OnFetchDataTaskListener<Movie[]> fetchDataTaskListener) {
         this.mFetchDataTaskListener = fetchDataTaskListener;
     }
 

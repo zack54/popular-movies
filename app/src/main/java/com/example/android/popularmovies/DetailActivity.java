@@ -27,7 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.model.Movie;
+import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.utilities.FetchImages;
 
 import butterknife.BindView;
