@@ -28,7 +28,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +63,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     TextView mVoteTextView;
     @BindView(R.id.detail_tv_overview)
     TextView mOverviewTextView;
+    @BindView(R.id.detail_lv_videos)
+    ListView mVideosListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,22 +169,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         int loaderId = loader.getId();
         switch (loaderId) {
             case FETCH_VIDEOS_LOADER_ID:
-                if (data != null && data instanceof String[]) {
-                    //call helper method to populate
-                }
-                // ... cast data
+                displayVideos(data);
                 return;
             case FETCH_REVIEWS_LOADER_ID:
-                if (data != null && data instanceof ContentValues[]) {
-
-                }
-                // ... cast data
+                displayReviews(data);
                 return;
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loader);
         }
     }
 
+    // TODO: ...
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
         int loaderId = loader.getId();
@@ -193,4 +195,39 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    // TODO ...
+    private void displayVideos(Object data) {
+        if (data != null && data instanceof String[]) {
+            String[] videos = (String[]) data;
+            VideosArrayAdapter adapter = new VideosArrayAdapter(this, videos);
+            mVideosListView.setAdapter(adapter);
+
+            ListAdapter listAdapter = mVideosListView.getAdapter();
+            if (listAdapter == null) {
+                return;
+            }
+            int desiredWidth = View.MeasureSpec.makeMeasureSpec(
+                    mVideosListView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+            int totalHeight = 0;
+            View view = null;
+            for (int i = 0; i < listAdapter.getCount(); i++) {
+                view = listAdapter.getView(i, view, mVideosListView);
+                if (i == 0)
+                    view.setLayoutParams(new ViewGroup.LayoutParams(
+                            desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+                totalHeight += view.getMeasuredHeight();
+            }
+            ViewGroup.LayoutParams params = mVideosListView.getLayoutParams();
+            params.height = totalHeight + (mVideosListView.getDividerHeight() * (listAdapter.getCount() - 1));
+            mVideosListView.setLayoutParams(params);
+        }
+    }
+
+    private void displayReviews(Object data) {
+        if (data != null && data instanceof ContentValues[]) {
+
+        }
+    }
 }
