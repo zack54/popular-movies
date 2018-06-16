@@ -16,7 +16,7 @@
   -->
 
 <resources>
-    <dimen name="detail_movie_poster">300dp</dimen>
+    <dimen name="detail_movie_poster">185dp</dimen>
     <dimen name="view_padding">16dp</dimen>
     <dimen name="detail_release_date_margin">5dp</dimen>
     <dimen name="detail_vote_icon_size">18dp</dimen>

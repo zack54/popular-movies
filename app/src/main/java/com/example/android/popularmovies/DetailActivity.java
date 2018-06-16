@@ -52,8 +52,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Member Variables - Holds references to the Views in Detail Activity Layout.
     @BindView(R.id.detail_iv_poster)
     ImageView mPosterImageView;
-    @BindView(R.id.detail_tv_title)
-    TextView mTitleTextView;
     @BindView(R.id.detail_tv_release_date)
     TextView mReleaseDateTextView;
     @BindView(R.id.detail_tv_vote)
@@ -117,7 +115,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
             // Fetch the Movie Poster - Populates the Image View.
             String posterPath = movie.getmPosterPath();
-            FetchImages.usingRelativePathAndSize(mPosterImageView, posterPath, FetchImages.LARGE_IMAGE_SIZE);
+            FetchImages.usingRelativePathAndSize(mPosterImageView, posterPath, FetchImages.MEDIUM_IMAGE_SIZE);
 
             // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
             int id = movie.getmId();
@@ -127,7 +125,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             getSupportLoaderManager().initLoader(FETCH_REVIEWS_LOADER_ID, bundle, this);
 
             this.setTitle(movie.getmOriginalTitle());
-            mTitleTextView.setText(movie.getmOriginalTitle());
             String string = "(" + movie.getmReleaseDate() + ")";
             mReleaseDateTextView.setText(string);
             mVoteTextView.setText(String.valueOf(movie.getmVoteAverage()));
