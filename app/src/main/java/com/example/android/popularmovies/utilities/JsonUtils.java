@@ -17,6 +17,8 @@
 
 package com.example.android.popularmovies.utilities;
 
+import android.content.ContentValues;
+
 import com.example.android.popularmovies.data.Movie;
 
 import org.json.JSONArray;
@@ -26,7 +28,7 @@ import org.json.JSONObject;
 /**
  * Utility functions - Handles JSON data.
  */
-class JsonUtils {
+public class JsonUtils {
 
     /**
      * Parses JSON String and returns an Array of Movies.
@@ -35,9 +37,10 @@ class JsonUtils {
      * @return Array of Movies Objects.
      * @throws JSONException If JSON data cannot be properly parsed.
      */
-    public static Movie[] parseJson(String json) throws JSONException {
+    public static Movie[] getMoviesArrayFromJson(String json) throws JSONException {
 
         // Constants - Holds the keys needed to extract the info from JSON String.
+        final String MOVIE_ID = "id";
         final String MOVIE_RESULTS = "results";
         final String MOVIE_VOTE_AVERAGE = "vote_average";
         final String MOVIE_POSTER_PATH = "poster_path";
@@ -61,16 +64,86 @@ class JsonUtils {
         for (int i = 0; i < resultsMovies.length(); i++) {
 
             JSONObject movieJSONObject = resultsMovies.getJSONObject(i);
+            int id = movieJSONObject.getInt(MOVIE_ID);
             double voteAverage = movieJSONObject.getDouble(MOVIE_VOTE_AVERAGE);
             String posterPath = movieJSONObject.getString(MOVIE_POSTER_PATH);
             String originalTitle = movieJSONObject.getString(MOVIE_ORIGINAL_TITLE);
             String overview = movieJSONObject.getString(MOVIE_OVERVIEW);
             String releaseDate = movieJSONObject.getString(MOVIE_RELEASE_DATE);
 
-            movies[i] = new Movie(voteAverage, posterPath, originalTitle, overview, releaseDate);
+            movies[i] = new Movie(id, voteAverage, posterPath, originalTitle, overview, releaseDate);
         }
 
         return movies;
     }
 
+    public static String[] getVideosFromJson(String json) throws JSONException {
+
+        // Constants - Holds the keys needed to extract the info from JSON String.
+        final String VIDEO_RESULTS = "results";
+        final String VIDEO_KEY = "key";
+
+        // Local Variable - Holds an Array of Videos.
+        String[] videos;
+
+        if (json == null) {
+            return null;
+        }
+
+        // Gets the List of Videos from the JSON Object.
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray resultsVideos = jsonObject.getJSONArray(VIDEO_RESULTS);
+
+        // Extracts each Video's Key & Adds it to the Array of Videos.
+        videos = new String[resultsVideos.length()];
+        for (int i = 0; i < resultsVideos.length(); i++) {
+
+            JSONObject videoJSONObject = resultsVideos.getJSONObject(i);
+            String video = videoJSONObject.getString(VIDEO_KEY);
+
+            videos[i] = video;
+        }
+
+        return videos;
+    }
+
+    public static ContentValues[] getReviewsFromJson(String json) throws JSONException {
+
+        // Constants - Holds the keys needed to extract the info from JSON String.
+        final String REVIEW_RESULTS = "results";
+        final String REVIEW_AUTHOR = "author";
+        final String REVIEW_CONTENT = "content";
+
+        // Local Variable - Holds an Array of Reviews.
+        ContentValues[] reviews;
+
+        if (json == null) {
+            return null;
+        }
+
+        // Gets the List of Reviews from the JSON Object.
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray resultsReviews = jsonObject.getJSONArray(REVIEW_RESULTS);
+
+        // Extracts each Review's Properties & Adds them to the Array of Reviews.
+        reviews = new ContentValues[resultsReviews.length()];
+        for (int i = 0; i < resultsReviews.length(); i++) {
+
+            JSONObject reviewJSONObject = resultsReviews.getJSONObject(i);
+            String author = reviewJSONObject.getString(REVIEW_AUTHOR);
+            String content = reviewJSONObject.getString(REVIEW_CONTENT);
+
+            ContentValues review = new ContentValues();
+            review.put(REVIEW_AUTHOR, author);
+            review.put(REVIEW_CONTENT, content);
+
+            reviews[i] = review;
+        }
+
+        return reviews;
+    }
+
+    public static ContentValues[] getContentValuesArrayFromJson(String json) throws JSONException {
+        return null;
+    }
 }

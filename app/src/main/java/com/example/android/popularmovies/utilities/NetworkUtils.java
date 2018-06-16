@@ -34,33 +34,44 @@ import java.util.Scanner;
 public final class NetworkUtils {
 
     // Constants - Used To Avoid Errors that come with Typing Long URLs.
-    private static final String POPULAR_SORT_CRITERIA = "popular";
-    private static final String TOP_RATED_SORT_CRITERIA = "top_rated";
+    public static final String POPULAR_SORT_CRITERIA = "popular";
+    public static final String TOP_RATED_SORT_CRITERIA = "top_rated";
+    public static final String CRITERIA_KEY = "criteria";
+    public static final String ID_KEY = "id";
+    public static final String VIDEOS_ENDPOINT = "videos";
+    public static final String REVIEWS_ENDPOINT = "reviews";
+
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_KEY_PARAM = "api_key";
     private static final String API_KEY = BuildConfig.API_KEY;
 
-    public static String getPopularSortCriteria() {
+    public static String getDefaultSortCriteria() {
         return POPULAR_SORT_CRITERIA;
-    }
-
-    public static String getTopRatedSortCriteria() {
-        return TOP_RATED_SORT_CRITERIA;
     }
 
     /**
      * Builds the URL used to talk to the server using a API Key & a Sort Criteria.
      *
-     * @param sortCriteria The Sort Criteria that will be queried for.
+     * @param pathParameter The Sort Criteria that will be queried for.
      * @return The URL to use to query the server.
      */
-    public static URL buildUrl(String sortCriteria) {
+    public static URL buildUrl(String pathParameter, int movieId) {
 
         String stringUri = BASE_URL;
-        if (sortCriteria.equals(POPULAR_SORT_CRITERIA)) {
-            stringUri += POPULAR_SORT_CRITERIA;
-        } else if (sortCriteria.equals(TOP_RATED_SORT_CRITERIA)) {
-            stringUri += TOP_RATED_SORT_CRITERIA;
+
+        switch (pathParameter) {
+            case POPULAR_SORT_CRITERIA:
+                stringUri += POPULAR_SORT_CRITERIA;
+                break;
+            case TOP_RATED_SORT_CRITERIA:
+                stringUri += TOP_RATED_SORT_CRITERIA;
+                break;
+            case VIDEOS_ENDPOINT:
+                stringUri += movieId + "/" + VIDEOS_ENDPOINT;
+                break;
+            case REVIEWS_ENDPOINT:
+                stringUri += movieId + "/" + REVIEWS_ENDPOINT;
+                break;
         }
 
         Uri uri = Uri.parse(stringUri).buildUpon()

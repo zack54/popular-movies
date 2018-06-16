@@ -21,7 +21,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Defines the Data Model - a Movie.
+ * Defines the Movie Data Model.
  * Implement Parcelable - So a Movie Object can be passed between Activities.
  */
 public class Movie implements Parcelable {
@@ -40,6 +40,7 @@ public class Movie implements Parcelable {
     };
 
     // Member Variables - Holds the Movie's Properties.
+    private final int mId;
     private final double mVoteAverage;
     private final String mPosterPath;
     private final String mOriginalTitle;
@@ -47,8 +48,9 @@ public class Movie implements Parcelable {
     private final String mReleaseDate;
 
     // Public Constructor - Initializes the Movie's Properties.
-    public Movie(double mVoteAverage, String mPosterPath, String mOriginalTitle, String mOverview,
+    public Movie(int id, double mVoteAverage, String mPosterPath, String mOriginalTitle, String mOverview,
                  String mReleaseDate) {
+        this.mId = id;
         this.mVoteAverage = mVoteAverage;
         this.mPosterPath = mPosterPath;
         this.mOriginalTitle = mOriginalTitle;
@@ -58,11 +60,16 @@ public class Movie implements Parcelable {
 
     // Private Constructor - De-Serializes the Parcel object & Reconstructs the original Properties.
     private Movie(Parcel in) {
+        this.mId = in.readInt();
         this.mVoteAverage = in.readDouble();
         this.mPosterPath = in.readString();
         this.mOriginalTitle = in.readString();
         this.mOverview = in.readString();
         this.mReleaseDate = in.readString();
+    }
+
+    public int getmId() {
+        return mId;
     }
 
     public double getmVoteAverage() {
@@ -88,6 +95,7 @@ public class Movie implements Parcelable {
     // Serializes the Movie Object - Stores the Movie's Properties to a Parcel Object.
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mId);
         dest.writeDouble(mVoteAverage);
         dest.writeString(mPosterPath);
         dest.writeString(mOriginalTitle);

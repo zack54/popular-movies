@@ -33,8 +33,6 @@ import com.example.android.popularmovies.utilities.FetchImages;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private static final String IMAGE_SIZE = "w342/";
-
     // Member Variable - Stores a Reference to the Click Events External Handler.
     private final OnClickListener mClickHandler;
 
@@ -65,9 +63,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mMovies[position];
-        String posterPath = movie.getmPosterPath();
+        String posterRelativePath = movie.getmPosterPath();
         ImageView imageView = holder.posterImageView;
-        FetchImages.usingRelativePathAndSize(imageView, posterPath, IMAGE_SIZE);
+        FetchImages.usingRelativePathAndSize(imageView, posterRelativePath, FetchImages.SMALL_IMAGE_SIZE);
     }
 
     // Returns the Total Number of Movies.

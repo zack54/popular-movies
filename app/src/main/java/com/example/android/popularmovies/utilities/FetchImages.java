@@ -29,6 +29,10 @@ public class FetchImages {
     // Constant - Holds the Images' base url.
     private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
 
+    // Constants - Holds the size of the images to query.
+    public static final String LARGE_IMAGE_SIZE = "w500/";
+    public static final String SMALL_IMAGE_SIZE = "w342/";
+
     // Fetches & Loads an Image into an ImageView.
     public static void usingRelativePathAndSize(ImageView imageView, String relativePath,
                                                 String size) {

@@ -17,8 +17,13 @@
 
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -29,6 +34,9 @@ import android.widget.Toast;
 
 import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.utilities.FetchImages;
+import com.example.android.popularmovies.utilities.FetchReviews;
+import com.example.android.popularmovies.utilities.FetchVideos;
+import com.example.android.popularmovies.utilities.NetworkUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,10 +44,10 @@ import butterknife.ButterKnife;
 /**
  * Displays details about each Movie.
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
-    // Constant - Holds the size of the images to query for the detail layout.
-    private static final String IMAGE_SIZE = "w500/";
+    private static final int FETCH_VIDEOS_LOADER_ID = 10;
+    private static final int FETCH_REVIEWS_LOADER_ID = 20;
 
     // Member Variables - Holds references to the Views in Detail Activity Layout.
     @BindView(R.id.detail_iv_poster)
@@ -64,19 +72,10 @@ public class DetailActivity extends AppCompatActivity {
         // Adds Up Navigation Button into the Action Bar.
         addUpNavigationButton();
 
-        // Checks if a Movie Object is passed within the Intent, Then Populate the detail activity
-        Intent intent = getIntent();
-        if (intent == null) {
-            closeActivityOnError();
-        } else {
-            Movie movie = intent.getParcelableExtra("movie");
-            if (movie == null) {
-                closeActivityOnError();
-            } else {
-                populateUI(movie);
-            }
-        }
+        // Populates the Detail Activity's Views.
+        loadData();
     }
+
 
     // Helper Method - Shows the Up Navigation as an action button in the Action Bar.
     private void addUpNavigationButton() {
@@ -84,24 +83,6 @@ public class DetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    // Helper Method - Finishes the detail activity.
-    private void closeActivityOnError() {
-        finish();
-        Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
-    }
-
-    // Helper Method - Populates the detail activity's views with the movie's properties.
-    private void populateUI(Movie movie) {
-        this.setTitle(movie.getmOriginalTitle());
-        String posterPath = movie.getmPosterPath();
-        FetchImages.usingRelativePathAndSize(mPosterImageView, posterPath, IMAGE_SIZE);
-        mTitleTextView.setText(movie.getmOriginalTitle());
-        String string = "(" + movie.getmReleaseDate() + ")";
-        mReleaseDateTextView.setText(string);
-        mVoteTextView.setText(String.valueOf(movie.getmVoteAverage()));
-        mOverviewTextView.setText(movie.getmOverview());
     }
 
     // Navigates the Main Activity when Up Button is clicked.
@@ -113,6 +94,105 @@ public class DetailActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    // Helper Method - Populates the detail activity's views with the movie's properties.
+    private void loadData() {
+
+        // Checks if a Movie Object is passed within the Intent, Then Populate the detail activity
+        Movie movie = null;
+        Intent intent = getIntent();
+
+        if (intent == null) {
+            closeActivityOnError();
+        } else {
+            movie = intent.getParcelableExtra("movie");
+        }
+
+        if (movie == null) {
+            closeActivityOnError();
+        } else {
+
+            // Fetch the Movie Poster - Populates the Image View.
+            String posterPath = movie.getmPosterPath();
+            FetchImages.usingRelativePathAndSize(mPosterImageView, posterPath, FetchImages.LARGE_IMAGE_SIZE);
+
+            // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
+            int id = movie.getmId();
+            Bundle bundle = new Bundle();
+            bundle.putInt(NetworkUtils.ID_KEY, id);
+            getSupportLoaderManager().initLoader(FETCH_VIDEOS_LOADER_ID, bundle, this);
+            getSupportLoaderManager().initLoader(FETCH_REVIEWS_LOADER_ID, bundle, this);
+
+            this.setTitle(movie.getmOriginalTitle());
+            mTitleTextView.setText(movie.getmOriginalTitle());
+            String string = "(" + movie.getmReleaseDate() + ")";
+            mReleaseDateTextView.setText(string);
+            mVoteTextView.setText(String.valueOf(movie.getmVoteAverage()));
+            mOverviewTextView.setText(movie.getmOverview());
+        }
+    }
+
+    // Helper Method - Finishes the detail activity.
+    private void closeActivityOnError() {
+        finish();
+        Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Instantiates a New Loader for given ID.
+    @NonNull
+    @Override
+    public Loader onCreateLoader(int loaderID, @Nullable Bundle args) {
+
+        assert args != null;
+        int movieId = args.getInt(NetworkUtils.ID_KEY);
+
+        switch (loaderID) {
+            case FETCH_VIDEOS_LOADER_ID:
+                return new FetchVideos(this, movieId);
+            case FETCH_REVIEWS_LOADER_ID:
+                return new FetchReviews(this, movieId);
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderID);
+        }
+    }
+
+    // Updates the UI with the Loader Results after Network has Completed.
+    @Override
+    public void onLoadFinished(@NonNull Loader loader, Object data) {
+        int loaderId = loader.getId();
+        switch (loaderId) {
+            case FETCH_VIDEOS_LOADER_ID:
+                if (data != null && data instanceof String[]) {
+                    //call helper method to populate
+                }
+                // ... cast data
+                return;
+            case FETCH_REVIEWS_LOADER_ID:
+                if (data != null && data instanceof ContentValues[]) {
+
+                }
+                // ... cast data
+                return;
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loader);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader loader) {
+        int loaderId = loader.getId();
+        switch (loaderId) {
+            case FETCH_VIDEOS_LOADER_ID:
+                // ... cast data
+                return;
+            case FETCH_REVIEWS_LOADER_ID:
+                // ... cast data
+                return;
+            default:
+                // ...
         }
     }
 
