@@ -39,10 +39,9 @@ public class ReviewsAdapter extends ArrayAdapter<ContentValues> {
     private final Context mContext;
 
     // Constructor - Initializes the List of Reviews.
-    ReviewsAdapter(Context context, ContentValues[] values) {
-        super(context, -1, values);
+    ReviewsAdapter(Context context) {
+        super(context, -1);
         mContext = context;
-        setmReviews(values);
     }
 
     // Sets the List of Reviews & Notifies the Adapter that Data has changed.

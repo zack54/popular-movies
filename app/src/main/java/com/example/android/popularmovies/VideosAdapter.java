@@ -36,10 +36,9 @@ public class VideosAdapter extends ArrayAdapter<String> {
     private final Context mContext;
 
     // Constructor - Initializes the List of Videos.
-    VideosAdapter(Context context, String[] values) {
-        super(context, -1, values);
+    VideosAdapter(Context context) {
+        super(context, -1);
         mContext = context;
-        setmVideos(values);
     }
 
     // Sets the List of Videos & Notifies the Adapter that Data has changed.

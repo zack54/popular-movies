@@ -20,6 +20,7 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -37,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movie;
+import com.example.android.popularmovies.databinding.ActivityMainBinding;
 import com.example.android.popularmovies.utilities.FetchMovies;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
@@ -55,15 +57,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     private static final String INITIALIZE_LOADING = "initialize";
     private static final String RESTART_LOADING = "restart";
 
-    // Member Variables - Used to make UX better.
-    @BindView(R.id.tv_connection_error_message)
-    TextView mInternetConnectionErrorMessage;
-    @BindView(R.id.tv_loading_error_message)
-    TextView mLoadingErrorMessage;
-    @BindView(R.id.pb_loading_indicator)
-    ProgressBar mLoadingIndicator;
-    @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
+    // Member Variable - Holds references to the Views in Main Activity Layout.
+    private ActivityMainBinding mActivityMainBinding;
+
     private MoviesAdapter mMoviesAdapter;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
@@ -74,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Connects member variables to views in the main activity layout.
-        ButterKnife.bind(this);
+        // Data Binding - Links Views in the Detail Activity Layout UI.
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         // Setups the RecyclerView.
         setupRecyclerView();
@@ -88,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     }
 
 
+
     // Helper Method - Setups the RecyclerView's LayoutManager based on current Orientation.
     private void setupRecyclerView() {
         GridLayoutManager gridLayoutManager = null;
@@ -97,11 +94,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridLayoutManager = new GridLayoutManager(this, 2);
         }
-        mRecyclerView.setLayoutManager(gridLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
+        mActivityMainBinding.mainRecyclerView.setLayoutManager(gridLayoutManager);
+        mActivityMainBinding.mainRecyclerView.setHasFixedSize(true);
         mMoviesAdapter = new MoviesAdapter(this);
-        mRecyclerView.setAdapter(mMoviesAdapter);
+        mActivityMainBinding.mainRecyclerView.setAdapter(mMoviesAdapter);
     }
+
 
 
     // Helper Method - Restores the Main Activity State on orientation or get Default SortCriteria.
@@ -162,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     public void onLoadStarted() {
         mMoviesAdapter.setmMovies(null);
         showData();
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mActivityMainBinding.mainLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
     // Instantiates a New Loader for given ID.
@@ -176,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     // Updates the UI with the Loader Results after Network has Completed.
     @Override
     public void onLoadFinished(@NonNull Loader<Movie[]> loader, Movie[] data) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
             showData();
             mMoviesAdapter.setmMovies(data);
@@ -195,26 +193,26 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
     // Helper Method - Makes the Movies Data visible & Hides the Error Messages.
     private void showData() {
-        mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
-        mLoadingErrorMessage.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainConnectionErrorMessage.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainLoadingErrorMessage.setVisibility(View.INVISIBLE);
 
-        mRecyclerView.setVisibility(View.VISIBLE);
+        mActivityMainBinding.mainRecyclerView.setVisibility(View.VISIBLE);
     }
 
     // Helper Method - Makes Loading Error Message visible & Hides Movies Data and Connection Error.
     private void showLoadingErrorMessage() {
-        mInternetConnectionErrorMessage.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainConnectionErrorMessage.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainRecyclerView.setVisibility(View.INVISIBLE);
 
-        mLoadingErrorMessage.setVisibility(View.VISIBLE);
+        mActivityMainBinding.mainLoadingErrorMessage.setVisibility(View.VISIBLE);
     }
 
     // Helper Method - Makes Connection Error Message visible & Hides Movies Data and Loading Error.
     private void showConnectionErrorMessage() {
-        mRecyclerView.setVisibility(View.INVISIBLE);
-        mLoadingErrorMessage.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainRecyclerView.setVisibility(View.INVISIBLE);
+        mActivityMainBinding.mainLoadingErrorMessage.setVisibility(View.INVISIBLE);
 
-        mInternetConnectionErrorMessage.setVisibility(View.VISIBLE);
+        mActivityMainBinding.mainConnectionErrorMessage.setVisibility(View.VISIBLE);
     }
 
 

@@ -18,6 +18,7 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
@@ -52,7 +53,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private static final int FETCH_REVIEWS_LOADER_ID = 20;
 
     // Member Variable - Holds references to the Views in Detail Activity Layout.
-    ActivityDetailBinding activityDetailBinding;
+    private ActivityDetailBinding mActivityDetailBinding;
+
+    private VideosAdapter mVideosAdapter;
+    private ReviewsAdapter mReviewsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +64,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_detail);
 
         // Data Binding - Links Views in the Detail Activity Layout UI.
-        activityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+        mActivityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
+        // Setups the ListViews.
+        setupListViews(this);
 
         // Adds Up Navigation Button into the Action Bar.
         addUpNavigationButton();
@@ -69,6 +76,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         loadData();
     }
 
+    // Helper Method - Setups the ListViews' Adapters.
+    private void setupListViews(Context context) {
+        mVideosAdapter = new VideosAdapter(context);
+        mActivityDetailBinding.detailVideos.setAdapter(mVideosAdapter);
+
+        mReviewsAdapter = new ReviewsAdapter(context);
+        mActivityDetailBinding.detailReviews.setAdapter(mReviewsAdapter);
+    }
 
 
     // Helper Method - Shows the Up Navigation as an action button in the Action Bar.
@@ -113,7 +128,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             // Fetch the Movie Poster - Populates the Image View.
             String posterPath = movie.getmPosterPath();
             FetchPosters.usingRelativePathAndSize(
-                    activityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
+                    mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
 
             // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
             int id = movie.getmId();
@@ -125,9 +140,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
             this.setTitle(movie.getmOriginalTitle());
             String string = "(" + movie.getmReleaseDate() + ")";
-            activityDetailBinding.detailReleaseDate.setText(string);
-            activityDetailBinding.detailRate.setText(String.valueOf(movie.getmVoteAverage()));
-            activityDetailBinding.detailOverview.setText(movie.getmOverview());
+            mActivityDetailBinding.detailReleaseDate.setText(string);
+            mActivityDetailBinding.detailRate.setText(String.valueOf(movie.getmVoteAverage()));
+            mActivityDetailBinding.detailOverview.setText(movie.getmOverview());
 
             // Re-Adjusts the ListViews Height.
             if (!loaderManager.hasRunningLoaders()) {
@@ -182,14 +197,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         int loaderId = loader.getId();
         switch (loaderId) {
             case FETCH_VIDEOS_LOADER_ID:
-                VideosAdapter videosAdapter =
-                        (VideosAdapter) activityDetailBinding.detailVideos.getAdapter();
-                videosAdapter.setmVideos(null);
+                mVideosAdapter.setmVideos(null);
                 return;
             case FETCH_REVIEWS_LOADER_ID:
-                ReviewsAdapter reviewsAdapter =
-                        (ReviewsAdapter) activityDetailBinding.detailReviews.getAdapter();
-                reviewsAdapter.setmReviews(null);
+                mReviewsAdapter.setmReviews(null);
                 return;
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loader);
@@ -200,12 +211,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private void displayVideos(Object loadResults) {
         if (loadResults != null && loadResults instanceof String[]) {
             String[] videos = (String[]) loadResults;
-            VideosAdapter videosAdapter = new VideosAdapter(this, videos);
-            activityDetailBinding.detailVideos.setAdapter(videosAdapter);
+            mVideosAdapter.setmVideos(videos);
 
-            LayoutParams params = adjustListViewHeight(activityDetailBinding.detailVideos, videosAdapter);
-            activityDetailBinding.detailVideos.setLayoutParams(params);
-            activityDetailBinding.detailVideos.requestLayout();
+            LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailVideos, mVideosAdapter);
+            mActivityDetailBinding.detailVideos.setLayoutParams(params);
+            mActivityDetailBinding.detailVideos.requestLayout();
         }
     }
 
@@ -213,12 +223,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private void displayReviews(Object loadResults) {
         if (loadResults != null && loadResults instanceof ContentValues[]) {
             ContentValues[] reviews = (ContentValues[]) loadResults;
-            ReviewsAdapter reviewsAdapter = new ReviewsAdapter(this, reviews);
-            activityDetailBinding.detailReviews.setAdapter(reviewsAdapter);
+            mReviewsAdapter.setmReviews(reviews);
 
-            LayoutParams params = adjustListViewHeight(activityDetailBinding.detailReviews, reviewsAdapter);
-            activityDetailBinding.detailReviews.setLayoutParams(params);
-            activityDetailBinding.detailReviews.requestLayout();
+            LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailReviews, mReviewsAdapter);
+            mActivityDetailBinding.detailReviews.setLayoutParams(params);
+            mActivityDetailBinding.detailReviews.requestLayout();
         }
     }
 
