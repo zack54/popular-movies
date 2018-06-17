@@ -25,22 +25,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmovies.data.Movie;
-import com.example.android.popularmovies.utilities.FetchImages;
+import com.example.android.popularmovies.utilities.FetchPosters;
 
 /**
- * {@link RecyclerViewAdapter} exposes a list of Movies.
- * {@link android.support.v7.widget.RecyclerView}
+ * Exposes a list of Movies.
  */
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
 
     // Member Variable - Stores a Reference to the Click Events External Handler.
     private final OnClickListener mClickHandler;
 
-    // Member Variable - Stores the Movies Data Source.
+    // Member Variable - Stores the List of Movies.
     private Movie[] mMovies;
 
     // Constructor - Initializes the Click Events External Handler.
-    RecyclerViewAdapter(OnClickListener clickListener) {
+    MoviesAdapter(OnClickListener clickListener) {
         mClickHandler = clickListener;
     }
 
@@ -55,7 +54,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.main_list_item, parent, false);
+        View view = inflater.inflate(R.layout.main_poster_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -65,15 +64,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Movie movie = mMovies[position];
         String posterRelativePath = movie.getmPosterPath();
         ImageView imageView = holder.posterImageView;
-        FetchImages.usingRelativePathAndSize(imageView, posterRelativePath, FetchImages.MEDIUM_IMAGE_SIZE);
+        FetchPosters.usingRelativePathAndSize(imageView, posterRelativePath, FetchPosters.MEDIUM_IMAGE_SIZE);
     }
 
     // Returns the Total Number of Movies.
     @Override
     public int getItemCount() {
-        if (mMovies != null) {
-            return mMovies.length;
-        }
+        if (mMovies != null) return mMovies.length;
         return 0;
     }
 
@@ -90,7 +87,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            posterImageView = itemView.findViewById(R.id.main_iv_poster);
+            posterImageView = itemView.findViewById(R.id.main_poster);
             itemView.setOnClickListener(this);
         }
 

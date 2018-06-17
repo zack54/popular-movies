@@ -26,28 +26,50 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class VideosArrayAdapter extends ArrayAdapter<String> {
+/**
+ * Exposes a list of Videos.
+ */
+public class VideosAdapter extends ArrayAdapter<String> {
 
+    // Member Variable - Stores the List of Videos.
+    private String[] mVideos;
     private final Context mContext;
-    private final String[] mValues;
 
-    public VideosArrayAdapter(Context context, String[] values) {
+    // Constructor - Initializes the List of Videos.
+    VideosAdapter(Context context, String[] values) {
         super(context, -1, values);
-        this.mContext = context;
-        this.mValues = values;
+        mContext = context;
+        setmVideos(values);
     }
 
+    // Sets the List of Videos & Notifies the Adapter that Data has changed.
+    public void setmVideos(String[] videos) {
+        mVideos = videos;
+        notifyDataSetChanged();
+    }
+
+    // Populates & Binds View with the correct Video's Link.
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = null;
         if (inflater != null) {
             rowView = inflater.inflate(R.layout.detail_video_item, parent, false);
-            TextView textView = rowView.findViewById(R.id.detail_tv_video);
-            textView.setText("Trailer " + String.valueOf(position));
+            TextView videoView = rowView.findViewById(R.id.detail_video_number);
+
+            String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " +
+                    String.valueOf(position + 1);
+            videoView.setText(trailerNumber);
         }
         return rowView;
+    }
+
+    // Returns the Total Number of Videos.
+    @Override
+    public int getCount() {
+        if (mVideos != null) return mVideos.length;
+        return 0;
     }
 }

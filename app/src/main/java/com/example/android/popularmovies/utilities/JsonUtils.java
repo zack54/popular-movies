@@ -30,6 +30,10 @@ import org.json.JSONObject;
  */
 public class JsonUtils {
 
+    // Constants - Holds the keys needed to extract the info from JSON String.
+    public static final String REVIEW_AUTHOR = "author";
+    public static final String REVIEW_CONTENT = "content";
+
     /**
      * Parses JSON String and returns an Array of Movies.
      *
@@ -109,10 +113,7 @@ public class JsonUtils {
 
     public static ContentValues[] getReviewsFromJson(String json) throws JSONException {
 
-        // Constants - Holds the keys needed to extract the info from JSON String.
         final String REVIEW_RESULTS = "results";
-        final String REVIEW_AUTHOR = "author";
-        final String REVIEW_CONTENT = "content";
 
         // Local Variable - Holds an Array of Reviews.
         ContentValues[] reviews;

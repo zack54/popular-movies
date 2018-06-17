@@ -24,7 +24,7 @@ import com.squareup.picasso.Picasso;
 /**
  * Utility functions - Handles loading & caching images.
  */
-public class FetchImages {
+public class FetchPosters {
 
     // Constant - Holds the Images' base url.
     private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";

@@ -25,4 +25,8 @@
     <string name="detail_description_label">Description</string>
     <string name="detail_rate_icon">Rate Icon</string>
     <string name="internet_connection_error_message">No Internet Connection. Please try again</string>
+    <string name="detail_trailers_label">Trailers:</string>
+    <string name="detail_reviews_label">Reviews:</string>
+    <string name="detail_play_icon">Play Icon</string>
+    <string name="detail_trailer_label">Trailer</string>
 </resources>

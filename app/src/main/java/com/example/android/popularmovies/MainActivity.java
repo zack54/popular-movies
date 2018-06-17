@@ -45,10 +45,10 @@ import butterknife.ButterKnife;
 
 /**
  * Displays a grid of Movie Posters.
- * Implements RecyclerViewAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
+ * Implements MoviesAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
  * Implements FetchDataAsyncTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
  */
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnClickListener,
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnClickListener,
         LoaderManager.LoaderCallbacks<Movie[]> {
 
     private static final int FETCH_MOVIES_LOADER_ID = 0;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     ProgressBar mLoadingIndicator;
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
-    private RecyclerViewAdapter mRecyclerViewAdapter;
+    private MoviesAdapter mMoviesAdapter;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
     private String mCurrentSortCriteria;
@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerViewAdapter = new RecyclerViewAdapter(this);
-        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+        mMoviesAdapter = new MoviesAdapter(this);
+        mRecyclerView.setAdapter(mMoviesAdapter);
     }
 
 
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     // Prepares the UI Before Network Starts.
     public void onLoadStarted() {
-        mRecyclerViewAdapter.setmMovies(null);
+        mMoviesAdapter.setmMovies(null);
         showData();
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
             showData();
-            mRecyclerViewAdapter.setmMovies(data);
+            mMoviesAdapter.setmMovies(data);
         } else {
             showLoadingErrorMessage();
         }
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     // Resets the Loader - Clears any References to Loader's Data.
     @Override
     public void onLoaderReset(@NonNull Loader<Movie[]> loader) {
-        mRecyclerViewAdapter.setmMovies(null);
+        mMoviesAdapter.setmMovies(null);
     }
 
 

@@ -15,130 +15,155 @@
   ~
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".DetailActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/linearLayout2"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:context=".DetailActivity">
 
-        <ImageView
-            android:id="@+id/detail_iv_poster"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/movie_poster"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_height="120dp"
-            tools:layout_width="185dp" />
-
-        <TextView
-            android:id="@+id/detail_tv_release_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintStart_toEndOf="@+id/detail_iv_poster"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_height="20dp"
-            tools:layout_width="100dp" />
-
-        <View
-            android:id="@+id/detail_v_constraint"
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_tv_release_date"
-            app:layout_constraintEnd_toEndOf="@+id/detail_tv_release_date"
-            app:layout_constraintStart_toStartOf="@+id/detail_tv_release_date"
-            app:layout_constraintTop_toTopOf="@+id/detail_tv_release_date" />
-
-        <TextView
-            android:id="@+id/detail_tv_vote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/detail_v_constraint"
-            app:layout_constraintTop_toBottomOf="@+id/detail_tv_release_date" />
-
-        <ImageView
-            android:id="@+id/detail_iv_vote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:contentDescription="@string/detail_rate_icon"
-            android:src="@drawable/baseline_star_rate_black_18"
-            app:layout_constraintStart_toEndOf="@+id/detail_v_constraint"
-            app:layout_constraintTop_toBottomOf="@+id/detail_tv_release_date" />
-
-        <TextView
-            android:id="@+id/detail_tv_overview"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detail_iv_poster" />
-
-        <TextView
-            android:id="@+id/detail_tv_trailers_label"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/text_view_top_border"
-            android:text="Trailers:"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="center_vertical"
-            android:paddingTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detail_tv_overview" />
+            android:layout_height="wrap_content">
 
-        <ListView
-            android:id="@+id/detail_lv_videos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detail_tv_trailers_label"></ListView>
+            <ImageView
+                android:id="@+id/detail_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/movie_poster"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_height="120dp"
+                tools:layout_width="185dp" />
 
-        <ListView
-            android:id="@+id/detail_lv_reviews"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detail_lv_videos"></ListView>
+            <TextView
+                android:id="@+id/detail_release_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:textSize="@dimen/text_size"
+                app:layout_constraintStart_toEndOf="@+id/detail_poster"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_height="20dp"
+                tools:layout_width="100dp" />
 
-    </android.support.constraint.ConstraintLayout>
+            <View
+                android:id="@+id/detail_constraint"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/detail_release_date"
+                app:layout_constraintEnd_toEndOf="@+id/detail_release_date"
+                app:layout_constraintStart_toStartOf="@+id/detail_release_date"
+                app:layout_constraintTop_toTopOf="@+id/detail_release_date" />
 
-</ScrollView>
+            <TextView
+                android:id="@+id/detail_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/detail_constraint"
+                app:layout_constraintTop_toBottomOf="@+id/detail_release_date" />
+
+            <ImageView
+                android:id="@+id/detail_star_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/detail_rate_icon"
+                android:src="@drawable/baseline_star_rate_black_18"
+                app:layout_constraintStart_toEndOf="@+id/detail_constraint"
+                app:layout_constraintTop_toBottomOf="@+id/detail_release_date" />
+
+            <TextView
+                android:id="@+id/detail_overview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_poster" />
+
+            <TextView
+                android:id="@+id/detail_trailers_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/text_view_top_border"
+                android:text="@string/detail_trailers_label"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_overview" />
+
+            <ListView
+                android:id="@+id/detail_videos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_trailers_label"
+                tools:ignore="NestedScrolling" />
+
+            <TextView
+                android:id="@+id/detail_reviews_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/text_view_top_border"
+                android:text="@string/detail_reviews_label"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_videos" />
+
+            <ListView
+                android:id="@+id/detail_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label"
+                tools:ignore="NestedScrolling" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+</layout>

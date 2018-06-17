@@ -15,21 +15,15 @@
   ~
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/detail_video_number"
+    <ImageView
+        android:id="@+id/main_poster"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="16dp"
-        android:gravity="center_vertical"
-        android:drawableLeft="@drawable/baseline_play_circle_outline_black_48"
-        android:drawableStart="@drawable/baseline_play_circle_outline_black_48"
-        android:drawablePadding="16dp"
-        android:contentDescription="@string/detail_play_icon" />
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/grid_views_margin"
+        android:contentDescription="@string/movie_poster" />
 
-</LinearLayout>
+</FrameLayout>
