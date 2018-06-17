@@ -18,6 +18,8 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -27,7 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 /**
- * Exposes a list of Videos.
+ * Exposes a list of Videos - Plays Trailers.
  */
 public class VideosAdapter extends ArrayAdapter<String> {
 
@@ -50,19 +52,35 @@ public class VideosAdapter extends ArrayAdapter<String> {
     // Populates & Binds View with the correct Video's Link.
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = null;
         if (inflater != null) {
             rowView = inflater.inflate(R.layout.detail_video_item, parent, false);
-            TextView videoView = rowView.findViewById(R.id.detail_video_number);
 
-            String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " +
-                    String.valueOf(position + 1);
+            TextView videoView = rowView.findViewById(R.id.detail_video_number);
+            String trailerNumber = mContext.getString(R.string.detail_trailer_label)
+                    + " " + String.valueOf(position + 1);
             videoView.setText(trailerNumber);
+
+            handleItemClickEvent(rowView, position);
         }
+        //noinspection ConstantConditions
         return rowView;
+    }
+
+    // Helper Method - Handles Click Events - Plays Video in Youtube App if exist, Otherwise in Browser App.
+    private void handleItemClickEvent(View rowView, final int position) {
+        rowView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String videoId = mVideos[position];
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+                intent.putExtra("VIDEO_ID", videoId);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     // Returns the Total Number of Videos.

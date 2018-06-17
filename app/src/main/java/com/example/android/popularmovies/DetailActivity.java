@@ -76,6 +76,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         loadData();
     }
 
+
     // Helper Method - Setups the ListViews' Adapters.
     private void setupListViews(Context context) {
         mVideosAdapter = new VideosAdapter(context);
