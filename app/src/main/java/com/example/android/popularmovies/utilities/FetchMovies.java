@@ -17,10 +17,9 @@
 
 package com.example.android.popularmovies.utilities;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
-
-import com.example.android.popularmovies.data.Movie;
 
 import java.net.URL;
 
@@ -28,10 +27,10 @@ import java.net.URL;
  * A Separate Background Task to Fetch Movies for a specific Movie.
  * Makes the Code more maintainable.
  */
-public class FetchMovies extends AsyncTaskLoader<Movie[]> {
+public class FetchMovies extends AsyncTaskLoader<ContentValues[]> {
 
     // Member Variable - Holds & Caches the Result of the load.
-    private Movie[] mMovies;
+    private ContentValues[] mMovies;
     private final String mPathParameter;
 
     // Public Constructor.
@@ -52,7 +51,7 @@ public class FetchMovies extends AsyncTaskLoader<Movie[]> {
 
     // Starts Connection & Parse Response.
     @Override
-    public Movie[] loadInBackground() {
+    public ContentValues[] loadInBackground() {
         // If there's no sort criteria, there's nothing to look up.
         if (mPathParameter == null) {
             return null;
@@ -62,7 +61,7 @@ public class FetchMovies extends AsyncTaskLoader<Movie[]> {
 
         try {
             String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
-            return JsonUtils.getMoviesArrayFromJson(jsonString);
+            return JsonUtils.getMoviesContentValuesFromJson(jsonString);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,7 +71,7 @@ public class FetchMovies extends AsyncTaskLoader<Movie[]> {
 
     // Caches & Sends the Result of the load to the Registered Listener.
     @Override
-    public void deliverResult(Movie[] data) {
+    public void deliverResult(ContentValues[] data) {
         mMovies = data;
         super.deliverResult(data);
     }

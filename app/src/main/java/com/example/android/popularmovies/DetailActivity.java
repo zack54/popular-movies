@@ -37,12 +37,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.databinding.ActivityDetailBinding;
 import com.example.android.popularmovies.utilities.FetchPosters;
 import com.example.android.popularmovies.utilities.FetchReviews;
 import com.example.android.popularmovies.utilities.FetchVideos;
-import com.example.android.popularmovies.utilities.NetworkUtils;
+import com.example.android.popularmovies.utilities.JsonUtils;
 
 /**
  * Displays details about each Movie.
@@ -111,39 +110,39 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     // Helper Method - Populates the detail activity's views with the movie's properties.
     private void loadData() {
+        Bundle movieBundle = null;
 
-        // Checks if a Movie Object is passed within the Intent, Then Populate the detail activity
-        Movie movie = null;
+        // Checks if a Movie is passed within the Intent, Then Populate the detail activity
         Intent intent = getIntent();
-
         if (intent == null) {
             closeActivityOnError();
         } else {
-            movie = intent.getParcelableExtra("movie");
+            movieBundle = intent.getExtras();
         }
 
-        if (movie == null) {
+        if (movieBundle == null) {
             closeActivityOnError();
         } else {
 
             // Fetch the Movie Poster - Populates the Image View.
-            String posterPath = movie.getmPosterPath();
+            String posterPath = movieBundle.getString(JsonUtils.MOVIE_POSTER_PATH);
             FetchPosters.usingRelativePathAndSize(
                     mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
 
             // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
-            int id = movie.getmId();
-            Bundle bundle = new Bundle();
-            bundle.putInt(NetworkUtils.ID_KEY, id);
             LoaderManager loaderManager = getSupportLoaderManager();
-            loaderManager.initLoader(FETCH_VIDEOS_LOADER_ID, bundle, this);
-            loaderManager.initLoader(FETCH_REVIEWS_LOADER_ID, bundle, this);
+            loaderManager.initLoader(FETCH_VIDEOS_LOADER_ID, movieBundle, this);
+            loaderManager.initLoader(FETCH_REVIEWS_LOADER_ID, movieBundle, this);
 
-            this.setTitle(movie.getmOriginalTitle());
-            String string = "(" + movie.getmReleaseDate() + ")";
-            mActivityDetailBinding.detailReleaseDate.setText(string);
-            mActivityDetailBinding.detailRate.setText(String.valueOf(movie.getmVoteAverage()));
-            mActivityDetailBinding.detailOverview.setText(movie.getmOverview());
+            this.setTitle(movieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
+
+            String stringReleaseDate = "(" + movieBundle.getString(JsonUtils.MOVIE_RELEASE_DATE) + ")";
+            mActivityDetailBinding.detailReleaseDate.setText(stringReleaseDate);
+
+            String stringRate = String.valueOf(movieBundle.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
+            mActivityDetailBinding.detailRate.setText(stringRate);
+
+            mActivityDetailBinding.detailOverview.setText(movieBundle.getString(JsonUtils.MOVIE_OVERVIEW));
 
             // Re-Adjusts the ListViews Height.
             if (!loaderManager.hasRunningLoaders()) {
@@ -163,9 +162,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Instantiates a Loader for a given ID.
     @NonNull
     @Override
-    public Loader onCreateLoader(int loaderID, @Nullable Bundle args) {
-        assert args != null;
-        int movieId = args.getInt(NetworkUtils.ID_KEY);
+    public Loader onCreateLoader(int loaderID, @Nullable Bundle bundle) {
+        assert bundle != null;
+        int movieId = bundle.getInt(JsonUtils.MOVIE_ID);
         switch (loaderID) {
             case FETCH_VIDEOS_LOADER_ID:
                 return new FetchVideos(this, movieId);

@@ -17,6 +17,7 @@
 
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,8 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.utilities.FetchPosters;
+import com.example.android.popularmovies.utilities.JsonUtils;
 
 /**
  * Exposes a list of Movies.
@@ -36,7 +37,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private final OnClickListener mClickHandler;
 
     // Member Variable - Stores the List of Movies.
-    private Movie[] mMovies;
+    private ContentValues[] mMovies;
 
     // Constructor - Initializes the Click Events External Handler.
     MoviesAdapter(OnClickListener clickListener) {
@@ -44,8 +45,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     // Sets the Movies Data Source & Notifies the Adapter that Data has changed.
-    public void setmMovies(Movie[] movies) {
-        this.mMovies = movies;
+    public void setmMovies(ContentValues[] movies) {
+        mMovies = movies;
         notifyDataSetChanged();
     }
 
@@ -61,8 +62,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     // Populates & Binds a ViewHolder with the correct Movie's Image.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Movie movie = mMovies[position];
-        String posterRelativePath = movie.getmPosterPath();
+        ContentValues movie = mMovies[position];
+        String posterRelativePath = movie.getAsString(JsonUtils.MOVIE_POSTER_PATH);
         ImageView imageView = holder.posterImageView;
         FetchPosters.usingRelativePathAndSize(imageView, posterRelativePath, FetchPosters.MEDIUM_IMAGE_SIZE);
     }
@@ -76,7 +77,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     // Interface Definition - should be implemented by external component to handles Click Events.
     public interface OnClickListener {
-        void onClick(Movie currentMovie);
+        void onClick(ContentValues currentMovie);
     }
 
     // Caches Views for Movies item to be reused when needed.

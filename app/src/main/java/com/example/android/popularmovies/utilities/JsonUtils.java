@@ -34,6 +34,14 @@ public class JsonUtils {
     public static final String REVIEW_AUTHOR = "author";
     public static final String REVIEW_CONTENT = "content";
 
+    public static final String MOVIE_ID = "id";
+    public static final String MOVIE_RESULTS = "results";
+    public static final String MOVIE_VOTE_AVERAGE = "vote_average";
+    public static final String MOVIE_POSTER_PATH = "poster_path";
+    public static final String MOVIE_ORIGINAL_TITLE = "original_title";
+    public static final String MOVIE_OVERVIEW = "overview";
+    public static final String MOVIE_RELEASE_DATE = "release_date";
+
     /**
      * Parses JSON String and returns an Array of Movies.
      *
@@ -82,15 +90,6 @@ public class JsonUtils {
     }
 
     public static ContentValues[] getMoviesContentValuesFromJson(String json) throws JSONException {
-
-        // Constants - Holds the keys needed to extract the info from JSON String.
-        final String MOVIE_ID = "id";
-        final String MOVIE_RESULTS = "results";
-        final String MOVIE_VOTE_AVERAGE = "vote_average";
-        final String MOVIE_POSTER_PATH = "poster_path";
-        final String MOVIE_ORIGINAL_TITLE = "original_title";
-        final String MOVIE_OVERVIEW = "overview";
-        final String MOVIE_RELEASE_DATE = "release_date";
 
         // Local Variable - Holds an Array of Movies.
         ContentValues[] movies;
