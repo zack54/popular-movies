@@ -247,4 +247,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         params.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
         return params;
     }
+
+
+    // Helper Method - Adds/Deletes a Movie from Favorites.
+    public void addToFavorite(View view) {
+        // check favorite database 1st ...
+        // enable/disable the button ...
+        // change button's text ...
+        // add/delete from database ...
+    }
 }

@@ -29,4 +29,5 @@
     <string name="detail_reviews_label">Reviews:</string>
     <string name="detail_play_icon">Play Icon</string>
     <string name="detail_trailer_label">Trailer</string>
+    <string name="detail_favorite_button">Mark As\nFavorite</string>
 </resources>
