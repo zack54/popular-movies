@@ -18,6 +18,7 @@
 package com.example.android.popularmovies.utilities;
 
 import android.content.ContentValues;
+import android.os.Bundle;
 
 import com.example.android.popularmovies.data.Movie;
 
@@ -31,11 +32,15 @@ import org.json.JSONObject;
 public class JsonUtils {
 
     // Constants - Holds the keys needed to extract the info from JSON String.
+    private static final String REVIEW_RESULTS = "results";
     public static final String REVIEW_AUTHOR = "author";
     public static final String REVIEW_CONTENT = "content";
 
+    private static final String VIDEO_RESULTS = "results";
+    private static final String VIDEO_KEY = "key";
+
+    private static final String MOVIE_RESULTS = "results";
     public static final String MOVIE_ID = "id";
-    public static final String MOVIE_RESULTS = "results";
     public static final String MOVIE_VOTE_AVERAGE = "vote_average";
     public static final String MOVIE_POSTER_PATH = "poster_path";
     public static final String MOVIE_ORIGINAL_TITLE = "original_title";
@@ -127,11 +132,45 @@ public class JsonUtils {
         return movies;
     }
 
-    public static String[] getVideosFromJson(String json) throws JSONException {
+    public static Bundle[] getMoviesBundlesFromJson(String json) throws JSONException {
 
-        // Constants - Holds the keys needed to extract the info from JSON String.
-        final String VIDEO_RESULTS = "results";
-        final String VIDEO_KEY = "key";
+        // Local Variable - Holds an Array of Movies.
+        Bundle[] movies;
+
+        if (json == null) {
+            return null;
+        }
+
+        // Gets the List of Movies from the JSON Object.
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray resultsMovies = jsonObject.getJSONArray(MOVIE_RESULTS);
+
+        // Extracts each Movie's Properties & Adds a Movie Object to the Array of Movies.
+        movies = new Bundle[resultsMovies.length()];
+        for (int i = 0; i < resultsMovies.length(); i++) {
+
+            JSONObject movieJSONObject = resultsMovies.getJSONObject(i);
+            int id = movieJSONObject.getInt(MOVIE_ID);
+            double voteAverage = movieJSONObject.getDouble(MOVIE_VOTE_AVERAGE);
+            String posterPath = movieJSONObject.getString(MOVIE_POSTER_PATH);
+            String originalTitle = movieJSONObject.getString(MOVIE_ORIGINAL_TITLE);
+            String overview = movieJSONObject.getString(MOVIE_OVERVIEW);
+            String releaseDate = movieJSONObject.getString(MOVIE_RELEASE_DATE);
+
+            Bundle movieBundle = new Bundle();
+            movieBundle.putInt(MOVIE_ID, id);
+            movieBundle.putDouble(MOVIE_VOTE_AVERAGE, voteAverage);
+            movieBundle.putString(MOVIE_POSTER_PATH, posterPath);
+            movieBundle.putString(MOVIE_ORIGINAL_TITLE, originalTitle);
+            movieBundle.putString(MOVIE_OVERVIEW, overview);
+            movieBundle.putString(MOVIE_RELEASE_DATE, releaseDate);
+
+            movies[i] = movieBundle;
+        }
+        return movies;
+    }
+
+    public static String[] getVideosFromJson(String json) throws JSONException {
 
         // Local Variable - Holds an Array of Videos.
         String[] videos;
@@ -158,8 +197,6 @@ public class JsonUtils {
     }
 
     public static ContentValues[] getReviewsFromJson(String json) throws JSONException {
-
-        final String REVIEW_RESULTS = "results";
 
         // Local Variable - Holds an Array of Reviews.
         ContentValues[] reviews;

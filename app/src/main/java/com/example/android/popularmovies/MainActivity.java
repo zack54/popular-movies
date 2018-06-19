@@ -17,7 +17,6 @@
 
 package com.example.android.popularmovies;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -35,10 +34,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.databinding.ActivityMainBinding;
 import com.example.android.popularmovies.utilities.FetchMovies;
-import com.example.android.popularmovies.utilities.JsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
 /**
@@ -47,7 +44,7 @@ import com.example.android.popularmovies.utilities.NetworkUtils;
  * Implements FetchDataAsyncTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
  */
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnClickListener,
-        LoaderManager.LoaderCallbacks<ContentValues[]> {
+        LoaderManager.LoaderCallbacks<Bundle[]> {
 
     private static final int FETCH_MOVIES_LOADER_ID = 0;
     private static final String INITIALIZE_LOADING = "initialize";
@@ -162,14 +159,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     // Instantiates a New Loader for given ID.
     @NonNull
     @Override
-    public Loader<ContentValues[]> onCreateLoader(int loaderID, @Nullable Bundle args) {
+    public Loader<Bundle[]> onCreateLoader(int loaderID, @Nullable Bundle args) {
         assert args != null;
         return new FetchMovies(this, args.getString(NetworkUtils.CRITERIA_KEY));
     }
 
     // Updates the UI with the Loader Results after Network has Completed.
     @Override
-    public void onLoadFinished(@NonNull Loader<ContentValues[]> loader, ContentValues[] data) {
+    public void onLoadFinished(@NonNull Loader<Bundle[]> loader, Bundle[] data) {
         mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
             showData();
@@ -181,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
     // Resets the Loader - Clears any References to Loader's Data.
     @Override
-    public void onLoaderReset(@NonNull Loader<ContentValues[]> loader) {
+    public void onLoaderReset(@NonNull Loader<Bundle[]> loader) {
         mMoviesAdapter.setmMovies(null);
     }
 
@@ -214,19 +211,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
     // Handles RecyclerView items Clicks - Launches the detail activity for the correct Movie.
     @Override
-    public void onClick(ContentValues currentMovie) {
-
-        // Maps the ContentValue to a Bundle.
-        Bundle movieBundle = new Bundle();
-        movieBundle.putInt(JsonUtils.MOVIE_ID, currentMovie.getAsInteger(JsonUtils.MOVIE_ID));
-        movieBundle.putDouble(JsonUtils.MOVIE_VOTE_AVERAGE, currentMovie.getAsDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
-        movieBundle.putString(JsonUtils.MOVIE_POSTER_PATH, currentMovie.getAsString(JsonUtils.MOVIE_POSTER_PATH));
-        movieBundle.putString(JsonUtils.MOVIE_ORIGINAL_TITLE, currentMovie.getAsString(JsonUtils.MOVIE_ORIGINAL_TITLE));
-        movieBundle.putString(JsonUtils.MOVIE_OVERVIEW, currentMovie.getAsString(JsonUtils.MOVIE_OVERVIEW));
-        movieBundle.putString(JsonUtils.MOVIE_RELEASE_DATE, currentMovie.getAsString(JsonUtils.MOVIE_RELEASE_DATE));
-
+    public void onClick(Bundle currentMovie) {
         Intent detailIntent = new Intent(this, DetailActivity.class);
-        detailIntent.putExtras(movieBundle);
+        detailIntent.putExtras(currentMovie);
         startActivity(detailIntent);
     }
 

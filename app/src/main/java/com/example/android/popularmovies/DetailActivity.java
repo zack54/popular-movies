@@ -17,10 +17,13 @@
 
 package com.example.android.popularmovies;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -37,6 +40,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.data.FavoriteMoviesContract;
+import com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 import com.example.android.popularmovies.databinding.ActivityDetailBinding;
 import com.example.android.popularmovies.utilities.FetchPosters;
 import com.example.android.popularmovies.utilities.FetchReviews;
@@ -54,8 +59,16 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Member Variable - Holds references to the Views in Detail Activity Layout.
     private ActivityDetailBinding mActivityDetailBinding;
 
+    private ContentResolver mContentResolver;
+
+    private Bundle mCurrentMovieBundle;
+    private String mCurrentMovieId;
+    private Uri mCurrentMovieUri;
+
     private VideosAdapter mVideosAdapter;
     private ReviewsAdapter mReviewsAdapter;
+
+    private boolean mIsFavoriteMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +78,24 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         // Data Binding - Links Views in the Detail Activity Layout UI.
         mActivityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
+        mContentResolver = getContentResolver();
+
         // Setups the ListViews.
         setupListViews(this);
 
         // Adds Up Navigation Button into the Action Bar.
         addUpNavigationButton();
 
+        // Gets the Movie Bundle passed in.
+        storeMoviePassedIn();
+
+        // Check If Movie passed in is a Favorite.
+        checkFavoriteMovies();
+
         // Populates the Detail Activity's Views.
         loadData();
     }
+
 
 
     // Helper Method - Setups the ListViews' Adapters.
@@ -84,6 +106,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mReviewsAdapter = new ReviewsAdapter(context);
         mActivityDetailBinding.detailReviews.setAdapter(mReviewsAdapter);
     }
+
 
 
     // Helper Method - Shows the Up Navigation as an action button in the Action Bar.
@@ -107,47 +130,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-
-    // Helper Method - Populates the detail activity's views with the movie's properties.
-    private void loadData() {
-        Bundle movieBundle = null;
-
-        // Checks if a Movie is passed within the Intent, Then Populate the detail activity
+    // Helper Method - Stores a Reference to the Movie Passed in.
+    private void storeMoviePassedIn() {
         Intent intent = getIntent();
         if (intent == null) {
             closeActivityOnError();
         } else {
-            movieBundle = intent.getExtras();
-        }
-
-        if (movieBundle == null) {
-            closeActivityOnError();
-        } else {
-
-            // Fetch the Movie Poster - Populates the Image View.
-            String posterPath = movieBundle.getString(JsonUtils.MOVIE_POSTER_PATH);
-            FetchPosters.usingRelativePathAndSize(
-                    mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
-
-            // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
-            LoaderManager loaderManager = getSupportLoaderManager();
-            loaderManager.initLoader(FETCH_VIDEOS_LOADER_ID, movieBundle, this);
-            loaderManager.initLoader(FETCH_REVIEWS_LOADER_ID, movieBundle, this);
-
-            this.setTitle(movieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
-
-            String stringReleaseDate = "(" + movieBundle.getString(JsonUtils.MOVIE_RELEASE_DATE) + ")";
-            mActivityDetailBinding.detailReleaseDate.setText(stringReleaseDate);
-
-            String stringRate = String.valueOf(movieBundle.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
-            mActivityDetailBinding.detailRate.setText(stringRate);
-
-            mActivityDetailBinding.detailOverview.setText(movieBundle.getString(JsonUtils.MOVIE_OVERVIEW));
-
-            // Re-Adjusts the ListViews Height.
-            if (!loaderManager.hasRunningLoaders()) {
-                loaderManager.getLoader(FETCH_VIDEOS_LOADER_ID).forceLoad();
-                loaderManager.getLoader(FETCH_REVIEWS_LOADER_ID).forceLoad();
+            mCurrentMovieBundle = intent.getExtras();
+            if (mCurrentMovieBundle == null) {
+                closeActivityOnError();
+            } else {
+                mCurrentMovieId = String.valueOf(mCurrentMovieBundle.getInt(JsonUtils.MOVIE_ID));
+                mCurrentMovieUri = FavoriteMoviesContract.Movies.CONTENT_URI.buildUpon().appendPath(mCurrentMovieId).build();
             }
         }
     }
@@ -157,6 +151,67 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         finish();
         Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
     }
+
+
+    // Helper Method - Query the Favorite Database to Check If Movie is a Favorite.
+    private void checkFavoriteMovies() {
+        String[] selectionArgs = {mCurrentMovieId};
+        Cursor cursor = mContentResolver.query(mCurrentMovieUri, null, null, selectionArgs, null);
+        if (cursor != null) {
+            if (cursor.getCount() != 0) {
+                mIsFavoriteMovie = true;
+            }
+            cursor.close();
+        }
+    }
+
+
+    // Helper Method - Populates the detail activity's views with the movie's properties.
+    private void loadData() {
+
+        this.setTitle(mCurrentMovieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
+
+        String stringReleaseDate = "(" + mCurrentMovieBundle.getString(JsonUtils.MOVIE_RELEASE_DATE) + ")";
+        mActivityDetailBinding.detailReleaseDate.setText(stringReleaseDate);
+
+        String stringRate = String.valueOf(mCurrentMovieBundle.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
+        mActivityDetailBinding.detailRate.setText(stringRate);
+
+        mActivityDetailBinding.detailOverview.setText(mCurrentMovieBundle.getString(JsonUtils.MOVIE_OVERVIEW));
+
+        if (mIsFavoriteMovie) {
+
+            // Update the Favorite Button.
+            setButtonToDelete();
+
+            // TODO: ...
+            // Populate the rest of the UI from the Favorite Database.
+            // FetchPosters
+            // displayVideos()
+            // displayReviews()
+
+        } else {
+
+            // Update the Favorite Button.
+            setButtonToAdd();
+
+            // Fetch the Movie Poster - Populates the Image View.
+            String posterPath = mCurrentMovieBundle.getString(JsonUtils.MOVIE_POSTER_PATH);
+            FetchPosters.usingRelativePathAndSize(mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
+
+            // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
+            LoaderManager loaderManager = getSupportLoaderManager();
+            loaderManager.initLoader(FETCH_VIDEOS_LOADER_ID, mCurrentMovieBundle, this);
+            loaderManager.initLoader(FETCH_REVIEWS_LOADER_ID, mCurrentMovieBundle, this);
+
+            // Re-Adjusts the ListViews Height on Screen Rotation.
+            if (!loaderManager.hasRunningLoaders()) {
+                loaderManager.getLoader(FETCH_VIDEOS_LOADER_ID).forceLoad();
+                loaderManager.getLoader(FETCH_REVIEWS_LOADER_ID).forceLoad();
+            }
+        }
+    }
+
 
 
     // Instantiates a Loader for a given ID.
@@ -248,11 +303,62 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-    // Helper Method - Adds/Deletes a Movie from Favorites.
-    public void addToFavorite(View view) {
-        // check favorite database 1st ...
-        // enable/disable the button ...
-        // change button's text ...
-        // add/delete from database ...
+    // Handles Favorite Button Click events.
+    public void favoriteButtonClickListener(View view) {
+        if (mIsFavoriteMovie) {
+            deleteMovieFromFavorite();
+        } else {
+            addMovieToFavorite();
+        }
+    }
+
+    // Helper Method - Deletes a Movie from the Favorite Database.
+    private void deleteMovieFromFavorite() {
+        String[] selectionArgs = {mCurrentMovieId};
+        int rowsDeleted = mContentResolver.delete(mCurrentMovieUri, null, selectionArgs);
+
+        if (rowsDeleted != 0) {
+            Toast.makeText(this, "Movie Deleted to Favorites Successfully", Toast.LENGTH_SHORT).show();
+            mIsFavoriteMovie = false;
+            setButtonToAdd();
+        } else {
+            Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Helper Method - Inserts a Movie from the Favorite Database.
+    private void addMovieToFavorite() {
+
+        // Map Bundle to ContentValues.
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Movies.COLUMN_ID, mCurrentMovieBundle.getInt(JsonUtils.MOVIE_ID));
+        contentValues.put(Movies.COLUMN_VOTE_AVERAGE, mCurrentMovieBundle.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
+        contentValues.put(Movies.COLUMN_ORIGINAL_TITLE, mCurrentMovieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
+        contentValues.put(Movies.COLUMN_OVERVIEW, mCurrentMovieBundle.getString(JsonUtils.MOVIE_OVERVIEW));
+        contentValues.put(Movies.COLUMN_RELEASE_DATE, mCurrentMovieBundle.getString(JsonUtils.MOVIE_RELEASE_DATE));
+        // TODO: store the Movie Poster in Favorite Database (Not its path)
+        // contentValues.put(Movies.COLUMN_POSTER, );
+
+        Uri returnedUri = mContentResolver.insert(Movies.CONTENT_URI, contentValues);
+
+        if (returnedUri != null) {
+            Toast.makeText(this, "Movie Added to Favorites Successfully", Toast.LENGTH_SHORT).show();
+            mIsFavoriteMovie = true;
+            setButtonToDelete();
+        } else {
+            Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Helper Method - Updates the Button Functionality at Runtime.
+    private void setButtonToDelete() {
+        mActivityDetailBinding.detailButton.setText(getResources().getString(R.string.detail_delete_from_favorite));
+        mActivityDetailBinding.detailButton.setBackgroundColor(getResources().getColor(R.color.color_delete));
+    }
+
+    // Helper Method - Updates the Button Functionality at Runtime.
+    private void setButtonToAdd() {
+        mActivityDetailBinding.detailButton.setText(getResources().getString(R.string.detail_add_to_favorite));
+        mActivityDetailBinding.detailButton.setBackgroundColor(getResources().getColor(R.color.color_add));
     }
 }

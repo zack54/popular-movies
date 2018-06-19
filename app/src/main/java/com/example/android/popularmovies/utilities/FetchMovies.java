@@ -17,8 +17,8 @@
 
 package com.example.android.popularmovies.utilities;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 
 import java.net.URL;
@@ -27,10 +27,10 @@ import java.net.URL;
  * A Separate Background Task to Fetch Movies for a specific Movie.
  * Makes the Code more maintainable.
  */
-public class FetchMovies extends AsyncTaskLoader<ContentValues[]> {
+public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
 
     // Member Variable - Holds & Caches the Result of the load.
-    private ContentValues[] mMovies;
+    private Bundle[] mMovies;
     private final String mPathParameter;
 
     // Public Constructor.
@@ -51,7 +51,7 @@ public class FetchMovies extends AsyncTaskLoader<ContentValues[]> {
 
     // Starts Connection & Parse Response.
     @Override
-    public ContentValues[] loadInBackground() {
+    public Bundle[] loadInBackground() {
         // If there's no sort criteria, there's nothing to look up.
         if (mPathParameter == null) {
             return null;
@@ -61,7 +61,7 @@ public class FetchMovies extends AsyncTaskLoader<ContentValues[]> {
 
         try {
             String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
-            return JsonUtils.getMoviesContentValuesFromJson(jsonString);
+            return JsonUtils.getMoviesBundlesFromJson(jsonString);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +71,7 @@ public class FetchMovies extends AsyncTaskLoader<ContentValues[]> {
 
     // Caches & Sends the Result of the load to the Registered Listener.
     @Override
-    public void deliverResult(ContentValues[] data) {
+    public void deliverResult(Bundle[] data) {
         mMovies = data;
         super.deliverResult(data);
     }
