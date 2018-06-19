@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,6 +44,7 @@ import android.widget.Toast;
 import com.example.android.popularmovies.data.FavoriteMoviesContract;
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 import com.example.android.popularmovies.databinding.ActivityDetailBinding;
+import com.example.android.popularmovies.utilities.BitmapUtility;
 import com.example.android.popularmovies.utilities.FetchPosters;
 import com.example.android.popularmovies.utilities.FetchReviews;
 import com.example.android.popularmovies.utilities.FetchVideos;
@@ -64,6 +66,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private Bundle mCurrentMovieBundle;
     private String mCurrentMovieId;
     private Uri mCurrentMovieUri;
+    private Bitmap mCurrentMovieImageBitmap;
+    private byte[] mCurrentMovieImageBytes;
 
     private VideosAdapter mVideosAdapter;
     private ReviewsAdapter mReviewsAdapter;
@@ -130,6 +134,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
+
     // Helper Method - Stores a Reference to the Movie Passed in.
     private void storeMoviePassedIn() {
         Intent intent = getIntent();
@@ -153,6 +158,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
+
     // Helper Method - Query the Favorite Database to Check If Movie is a Favorite.
     private void checkFavoriteMovies() {
         String[] selectionArgs = {mCurrentMovieId};
@@ -160,14 +166,20 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         if (cursor != null) {
             if (cursor.getCount() != 0) {
                 mIsFavoriteMovie = true;
+
+                // Get image from the Database.
+                if (cursor.moveToFirst()) {
+                    mCurrentMovieImageBytes = cursor.getBlob(cursor.getColumnIndex(Movies.COLUMN_POSTER));
+                }
             }
             cursor.close();
         }
     }
 
 
-    // Helper Method - Populates the detail activity's views with the movie's properties.
+    // Helper Method - Populates the detail activity's views with the Movie's properties.
     private void loadData() {
+
 
         this.setTitle(mCurrentMovieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
 
@@ -184,6 +196,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             // Update the Favorite Button.
             setButtonToDelete();
 
+            Bitmap imageBitmap = BitmapUtility.getImage(mCurrentMovieImageBytes);
+            mActivityDetailBinding.detailPoster.setImageBitmap(imageBitmap);
+            //
             // TODO: ...
             // Populate the rest of the UI from the Favorite Database.
             // FetchPosters
@@ -195,9 +210,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             // Update the Favorite Button.
             setButtonToAdd();
 
-            // Fetch the Movie Poster - Populates the Image View.
+            // Fetch the Movie Poster - Populates the Image View & save a Reference to the Poster.
             String posterPath = mCurrentMovieBundle.getString(JsonUtils.MOVIE_POSTER_PATH);
-            FetchPosters.usingRelativePathAndSize(mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
+            mCurrentMovieImageBitmap = new FetchPosters().usingRelativePathAndSize(
+                    mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
 
             // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
             LoaderManager loaderManager = getSupportLoaderManager();
@@ -333,11 +349,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         ContentValues contentValues = new ContentValues();
         contentValues.put(Movies.COLUMN_ID, mCurrentMovieBundle.getInt(JsonUtils.MOVIE_ID));
         contentValues.put(Movies.COLUMN_VOTE_AVERAGE, mCurrentMovieBundle.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
+        contentValues.put(Movies.COLUMN_POSTER, BitmapUtility.getBytes(mCurrentMovieImageBitmap));
         contentValues.put(Movies.COLUMN_ORIGINAL_TITLE, mCurrentMovieBundle.getString(JsonUtils.MOVIE_ORIGINAL_TITLE));
         contentValues.put(Movies.COLUMN_OVERVIEW, mCurrentMovieBundle.getString(JsonUtils.MOVIE_OVERVIEW));
         contentValues.put(Movies.COLUMN_RELEASE_DATE, mCurrentMovieBundle.getString(JsonUtils.MOVIE_RELEASE_DATE));
-        // TODO: store the Movie Poster in Favorite Database (Not its path)
-        // contentValues.put(Movies.COLUMN_POSTER, );
 
         Uri returnedUri = mContentResolver.insert(Movies.CONTENT_URI, contentValues);
 

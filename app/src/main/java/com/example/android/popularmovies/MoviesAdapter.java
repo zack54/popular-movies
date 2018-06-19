@@ -65,7 +65,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         Bundle movie = mMovies[position];
         String posterRelativePath = movie.getString(JsonUtils.MOVIE_POSTER_PATH);
         ImageView imageView = holder.posterImageView;
-        FetchPosters.usingRelativePathAndSize(imageView, posterRelativePath, FetchPosters.MEDIUM_IMAGE_SIZE);
+        new FetchPosters().usingRelativePathAndSize(imageView, posterRelativePath, FetchPosters.MEDIUM_IMAGE_SIZE);
     }
 
     // Returns the Total Number of Movies.
