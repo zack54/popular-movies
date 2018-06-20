@@ -45,7 +45,7 @@ import com.example.android.popularmovies.data.FavoriteMoviesContract;
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 import com.example.android.popularmovies.databinding.ActivityDetailBinding;
 import com.example.android.popularmovies.utilities.BitmapUtility;
-import com.example.android.popularmovies.utilities.FetchPosters;
+import com.example.android.popularmovies.utilities.FetchPoster;
 import com.example.android.popularmovies.utilities.FetchReviews;
 import com.example.android.popularmovies.utilities.FetchVideos;
 import com.example.android.popularmovies.utilities.JsonUtils;
@@ -66,6 +66,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private Bundle mCurrentMovieBundle;
     private String mCurrentMovieId;
     private Uri mCurrentMovieUri;
+
     private Bitmap mCurrentMovieImageBitmap;
     private byte[] mCurrentMovieImageBytes;
 
@@ -134,7 +135,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-
+    // TODO: check if bundle hase a flag favorite_movie.
     // Helper Method - Stores a Reference to the Movie Passed in.
     private void storeMoviePassedIn() {
         Intent intent = getIntent();
@@ -201,19 +202,19 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             //
             // TODO: ...
             // Populate the rest of the UI from the Favorite Database.
-            // FetchPosters
+            // FetchPoster
             // displayVideos()
             // displayReviews()
 
         } else {
 
-            // Update the Favorite Button.
+            // Update the Favorite Button Looks & Functionality.
             setButtonToAdd();
 
             // Fetch the Movie Poster - Populates the Image View & save a Reference to the Poster.
             String posterPath = mCurrentMovieBundle.getString(JsonUtils.MOVIE_POSTER_PATH);
-            mCurrentMovieImageBitmap = new FetchPosters().usingRelativePathAndSize(
-                    mActivityDetailBinding.detailPoster, posterPath, FetchPosters.MEDIUM_IMAGE_SIZE);
+            mCurrentMovieImageBitmap = FetchPoster.getPosterBitmap(posterPath, FetchPoster.MEDIUM_IMAGE_SIZE);
+            mActivityDetailBinding.detailPoster.setImageBitmap(mCurrentMovieImageBitmap);
 
             // Fetch the Movie Videos & Reviews - Populates the correspondent UI.
             LoaderManager loaderManager = getSupportLoaderManager();

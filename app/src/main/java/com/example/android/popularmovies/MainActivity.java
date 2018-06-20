@@ -33,6 +33,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.databinding.ActivityMainBinding;
 import com.example.android.popularmovies.utilities.FetchMovies;
@@ -76,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         loadData(mCurrentSortCriteria, INITIALIZE_LOADING);
     }
 
-
-
     // Helper Method - Setups the RecyclerView's LayoutManager based on current Orientation.
     private void setupRecyclerView() {
         GridLayoutManager gridLayoutManager = null;
@@ -93,48 +92,87 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         mActivityMainBinding.mainRecyclerView.setAdapter(mMoviesAdapter);
     }
 
-
-
-    // Helper Method - Restores the Main Activity State on orientation or get Default SortCriteria.
+    // Helper Method - Restores Current SortCriteria on Orientation or Set to Default SortCriteria.
     private void restoreInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mCurrentSortCriteria = savedInstanceState.getString(NetworkUtils.CRITERIA_KEY);
         } else {
             mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
         }
+        setActivityTitle();
     }
 
-    // Saves the state of main activity before orientation.
+    // Helper Method - Sets the Activity Tiles.
+    private void setActivityTitle() {
+        switch (mCurrentSortCriteria) {
+            case NetworkUtils.POPULAR_SORT_CRITERIA:
+                this.setTitle(R.string.main_most_popular_option_menu);
+                break;
+            case NetworkUtils.TOP_RATED_SORT_CRITERIA:
+                this.setTitle(R.string.main_top_rated_option_menu);
+                break;
+            case NetworkUtils.FAVORITE_CRITERIA:
+                this.setTitle(R.string.main_favorite_option_menu);
+                break;
+        }
+    }
+
+    // Saves the Current Sort Criteria before Orientation.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
         super.onSaveInstanceState(outState);
     }
 
-
-
     // Helper Method - Starts Background Task based on Sort Criteria if there is Internet connection
     private void loadData(String sortCriteria, String flag) {
-        if (connectedToInternet()) {
 
-            // Prepares the UI Before Network Starts.
-            onLoadStarted();
+        // Prepares the UI Before Network Starts.
+        onLoadStarted();
 
-            Bundle bundle = new Bundle();
-            bundle.putString(NetworkUtils.CRITERIA_KEY, sortCriteria);
+        // Prepares SortCriteria to pass to the Loader.
+        Bundle bundle = new Bundle();
+        bundle.putString(NetworkUtils.CRITERIA_KEY, sortCriteria);
 
-            switch (flag) {
-                case INITIALIZE_LOADING:
-                    getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                    break;
-                case RESTART_LOADING:
-                    getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                    break;
-            }
+        // Update the Current Sort Criteria.
+        mCurrentSortCriteria = sortCriteria;
 
-            mCurrentSortCriteria = sortCriteria;
-        } else {
-            showConnectionErrorMessage();
+        switch (sortCriteria) {
+            case NetworkUtils.FAVORITE_CRITERIA:
+
+                // TODO: implement ...
+                // TODO: solve case empty database ...
+                switch (flag) {
+                    case INITIALIZE_LOADING:
+                        getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
+                        return;
+                    case RESTART_LOADING:
+                        getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
+                        return;
+                }
+
+                // TODO: delete
+                // Toast.makeText(this, "Need to implement Favorite Movies", Toast.LENGTH_SHORT).show();
+                // mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
+                //
+
+                return;
+            case NetworkUtils.POPULAR_SORT_CRITERIA:
+            case NetworkUtils.TOP_RATED_SORT_CRITERIA:
+                if (connectedToInternet()) {
+                    switch (flag) {
+                        case INITIALIZE_LOADING:
+                            getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
+                            return;
+                        case RESTART_LOADING:
+                            getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
+                            return;
+                    }
+                } else {
+                    mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
+                    showConnectionErrorMessage();
+                    return;
+                }
         }
     }
 
@@ -151,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
     // Prepares the UI Before Network Starts.
     public void onLoadStarted() {
-        mMoviesAdapter.setmMovies(null);
+        mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
         showData();
         mActivityMainBinding.mainLoadingIndicator.setVisibility(View.VISIBLE);
     }
@@ -170,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
             showData();
-            mMoviesAdapter.setmMovies(data);
+            mMoviesAdapter.setmMovies(data, mCurrentSortCriteria);
         } else {
             showLoadingErrorMessage();
         }
@@ -179,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     // Resets the Loader - Clears any References to Loader's Data.
     @Override
     public void onLoaderReset(@NonNull Loader<Bundle[]> loader) {
-        mMoviesAdapter.setmMovies(null);
+        mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
     }
 
 
@@ -214,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     public void onClick(Bundle currentMovie) {
         Intent detailIntent = new Intent(this, DetailActivity.class);
         detailIntent.putExtras(currentMovie);
+        detailIntent.putExtra(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
         startActivity(detailIntent);
     }
 
@@ -227,15 +266,22 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     // Handles Options Menu Items Clicks - Load Data with correct Sort Criteria.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.action_popular:
                 loadData(NetworkUtils.POPULAR_SORT_CRITERIA, RESTART_LOADING);
-                return true;
+                break;
             case R.id.action_top_rated:
                 loadData(NetworkUtils.TOP_RATED_SORT_CRITERIA, RESTART_LOADING);
-                return true;
+                break;
+            case R.id.action_favorite:
+                loadData(NetworkUtils.FAVORITE_CRITERIA, RESTART_LOADING);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+        setActivityTitle();
+        return true;
     }
 }

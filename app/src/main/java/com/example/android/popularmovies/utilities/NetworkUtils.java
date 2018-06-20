@@ -34,9 +34,11 @@ import java.util.Scanner;
 public final class NetworkUtils {
 
     // Constants - Used To Avoid Errors that come with Typing Long URLs.
+    public static final String CRITERIA_KEY = "criteria";
     public static final String POPULAR_SORT_CRITERIA = "popular";
     public static final String TOP_RATED_SORT_CRITERIA = "top_rated";
-    public static final String CRITERIA_KEY = "criteria";
+    public static final String FAVORITE_CRITERIA = "favorite";
+
     public static final String ID_KEY = "id";
     public static final String VIDEOS_ENDPOINT = "videos";
     public static final String REVIEWS_ENDPOINT = "reviews";

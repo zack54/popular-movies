@@ -16,19 +16,24 @@
   -->
 
 <resources>
+
     <string name="app_name">Popular Movies</string>
-    <string name="main_louading_error_message">An error has occurred. Please try again</string>
+
+    <string name="main_loading_error_message">An Error has occurred. Please try again</string>
+    <string name="main_connection_error_message">No Internet Connection. Please try again</string>
+    <string name="main_most_popular_option_menu">Most Popular Movies</string>
+    <string name="main_top_rated_option_menu">Top Rated Movies</string>
+    <string name="main_favorite_option_menu">Favorite Movies</string>
+
     <string name="detail_error_message">Movie data not available</string>
-    <string name="most_popular">Most Popular</string>
-    <string name="top_rated">Top Rated</string>
-    <string name="movie_poster">Movie Poster</string>
-    <string name="detail_description_label">Description</string>
-    <string name="detail_rate_icon">Rate Icon</string>
-    <string name="internet_connection_error_message">No Internet Connection. Please try again</string>
     <string name="detail_trailers_label">Trailers:</string>
-    <string name="detail_reviews_label">Reviews:</string>
-    <string name="detail_play_icon">Play Icon</string>
     <string name="detail_trailer_label">Trailer</string>
+    <string name="detail_reviews_label">Reviews:</string>
+    <string name="detail_rate_icon">Rate Icon</string>
+    <string name="detail_play_icon">Play Icon</string>
     <string name="detail_add_to_favorite">Add To\nFavorite</string>
     <string name="detail_delete_from_favorite">Delete From\nFavorite</string>
+
+    <string name="movie_poster">Movie Poster</string>
+
 </resources>

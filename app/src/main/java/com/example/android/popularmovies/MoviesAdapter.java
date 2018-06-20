@@ -17,6 +17,7 @@
 
 package com.example.android.popularmovies;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -25,8 +26,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.utilities.FetchPosters;
+import com.example.android.popularmovies.utilities.BitmapUtility;
+import com.example.android.popularmovies.utilities.FetchPoster;
 import com.example.android.popularmovies.utilities.JsonUtils;
+import com.example.android.popularmovies.utilities.NetworkUtils;
 
 /**
  * Exposes a list of Movies.
@@ -38,6 +41,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     // Member Variable - Stores the List of Movies.
     private Bundle[] mMovies;
+    private String mLoadFrom;
 
     // Constructor - Initializes the Click Events External Handler.
     MoviesAdapter(OnClickListener clickListener) {
@@ -45,8 +49,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     // Sets the Movies Data Source & Notifies the Adapter that Data has changed.
-    public void setmMovies(Bundle[] movies) {
+    public void setmMovies(Bundle[] movies, String loadFrom) {
         mMovies = movies;
+        mLoadFrom = loadFrom;
         notifyDataSetChanged();
     }
 
@@ -63,9 +68,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Bundle movie = mMovies[position];
-        String posterRelativePath = movie.getString(JsonUtils.MOVIE_POSTER_PATH);
-        ImageView imageView = holder.posterImageView;
-        new FetchPosters().usingRelativePathAndSize(imageView, posterRelativePath, FetchPosters.MEDIUM_IMAGE_SIZE);
+        ImageView imageView = holder.mainPosterImageView;
+
+        if (mLoadFrom.equals(NetworkUtils.FAVORITE_CRITERIA)) {
+            Bitmap imageBitmap = BitmapUtility.getImage(movie.getByteArray(JsonUtils.MOVIE_POSTER));
+            imageView.setImageBitmap(imageBitmap);
+        } else {
+            String posterRelativePath = movie.getString(JsonUtils.MOVIE_POSTER_PATH);
+            FetchPoster.intoImageView(imageView, posterRelativePath, FetchPoster.MEDIUM_IMAGE_SIZE);
+        }
     }
 
     // Returns the Total Number of Movies.
@@ -84,11 +95,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // Holds references to Sub-View within a List Item View.
-        final ImageView posterImageView;
+        final ImageView mainPosterImageView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            posterImageView = itemView.findViewById(R.id.main_poster);
+            mainPosterImageView = itemView.findViewById(R.id.main_poster);
             itemView.setOnClickListener(this);
         }
 

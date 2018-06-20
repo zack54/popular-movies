@@ -47,6 +47,8 @@ public class JsonUtils {
     public static final String MOVIE_OVERVIEW = "overview";
     public static final String MOVIE_RELEASE_DATE = "release_date";
 
+    public static final String MOVIE_POSTER = "poster";
+
     /**
      * Parses JSON String and returns an Array of Movies.
      *

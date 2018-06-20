@@ -22,11 +22,16 @@
     <item
         android:id="@+id/action_popular"
         android:orderInCategory="1"
-        android:title="@string/most_popular" />
+        android:title="@string/main_most_popular_option_menu" />
 
     <item
         android:id="@+id/action_top_rated"
         android:orderInCategory="2"
-        android:title="@string/top_rated" />
+        android:title="@string/main_top_rated_option_menu" />
+
+    <item
+        android:id="@+id/action_favorite"
+        android:orderInCategory="3"
+        android:title="@string/main_favorite_option_menu" />
 
 </menu>

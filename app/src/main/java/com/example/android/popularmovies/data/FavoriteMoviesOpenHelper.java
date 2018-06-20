@@ -48,10 +48,10 @@ public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + FavoriteMoviesContract.Movies.TABLE_NAME + " (" +
                         FavoriteMoviesContract.Movies.COLUMN_ID + " INTEGER PRIMARY KEY, " +
                         FavoriteMoviesContract.Movies.COLUMN_VOTE_AVERAGE + " FLOAT NOT NULL, " +
+                        FavoriteMoviesContract.Movies.COLUMN_POSTER + " BLOB, " +
                         FavoriteMoviesContract.Movies.COLUMN_ORIGINAL_TITLE + " TINYTEXT NOT NULL," +
                         FavoriteMoviesContract.Movies.COLUMN_OVERVIEW + " TEXT NOT NULL," +
-                        FavoriteMoviesContract.Movies.COLUMN_RELEASE_DATE + " TINYTEXT NOT NULL," +
-                        FavoriteMoviesContract.Movies.COLUMN_POSTER + " BLOB);";
+                        FavoriteMoviesContract.Movies.COLUMN_RELEASE_DATE + " TINYTEXT NOT NULL);";
 
         // Executes the SQL Statement - Creates the DataBase's Table.
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
