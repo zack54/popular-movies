@@ -99,7 +99,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
 
         // Register the ContentResolver's Listener to watch a Content URI for Changes.
         if (getContext() != null) {
-            returnedCursor.setNotificationUri(getContext().getContentResolver(), uri);
+            returnedCursor.setNotificationUri(getContext().getContentResolver(), Movies.CONTENT_URI);
         }
         return returnedCursor;
     }

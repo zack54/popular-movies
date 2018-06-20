@@ -30,6 +30,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -166,12 +167,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
                             return;
                         case RESTART_LOADING:
                             getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                            return;
                     }
                 } else {
                     mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
                     showConnectionErrorMessage();
-                    return;
                 }
         }
     }
@@ -209,6 +208,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         if (data != null) {
             showData();
             mMoviesAdapter.setmMovies(data, mCurrentSortCriteria);
+            if (data.length == 0 && mCurrentSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
+                Toast.makeText(this, "You have't Saved any Movie to Favorite", Toast.LENGTH_SHORT).show();
+            }
         } else {
             showLoadingErrorMessage();
         }
@@ -219,8 +221,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     public void onLoaderReset(@NonNull Loader<Bundle[]> loader) {
         mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
     }
-
-
 
     // Helper Method - Makes the Movies Data visible & Hides the Error Messages.
     private void showData() {

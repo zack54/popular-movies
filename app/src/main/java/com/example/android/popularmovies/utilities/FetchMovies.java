@@ -35,10 +35,6 @@ import java.util.Arrays;
  */
 public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
 
-    public static final String LOAD_KEY = "favorite";
-    public static final Boolean LOCAL_LOAD = true;
-    public static final Boolean CLOUD_LOAD = false;
-
     // Member Variable - Holds & Caches the Result of the load.
     private Bundle[] mMovies;
     private Context mContext;
@@ -75,7 +71,6 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
         try {
             String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
             return JsonUtils.getMoviesBundlesFromJson(jsonString);
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -92,9 +87,7 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
                         null,
                         null);
         if (cursor != null) {
-
             movies = new Bundle[cursor.getCount()];
-
             if (cursor.moveToFirst()) {
                 do {
                     Bundle movieBundle = new Bundle();
