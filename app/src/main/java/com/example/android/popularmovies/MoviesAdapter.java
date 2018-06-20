@@ -41,7 +41,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     // Member Variable - Stores the List of Movies.
     private Bundle[] mMovies;
-    private String mLoadFrom;
+    private String mSortCriteria;
 
     // Constructor - Initializes the Click Events External Handler.
     MoviesAdapter(OnClickListener clickListener) {
@@ -49,9 +49,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     // Sets the Movies Data Source & Notifies the Adapter that Data has changed.
-    public void setmMovies(Bundle[] movies, String loadFrom) {
+    public void setmMovies(Bundle[] movies, String sortCriteria) {
         mMovies = movies;
-        mLoadFrom = loadFrom;
+        mSortCriteria = sortCriteria;
         notifyDataSetChanged();
     }
 
@@ -70,7 +70,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         Bundle movie = mMovies[position];
         ImageView imageView = holder.mainPosterImageView;
 
-        if (mLoadFrom.equals(NetworkUtils.FAVORITE_CRITERIA)) {
+        if (mSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
             Bitmap imageBitmap = BitmapUtility.getImage(movie.getByteArray(JsonUtils.MOVIE_POSTER));
             imageView.setImageBitmap(imageBitmap);
         } else {
@@ -109,5 +109,4 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             mClickHandler.onClick(mMovies[getAdapterPosition()]);
         }
     }
-
 }

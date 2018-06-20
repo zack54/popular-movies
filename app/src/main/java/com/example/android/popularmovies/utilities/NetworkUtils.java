@@ -39,7 +39,6 @@ public final class NetworkUtils {
     public static final String TOP_RATED_SORT_CRITERIA = "top_rated";
     public static final String FAVORITE_CRITERIA = "favorite";
 
-    public static final String ID_KEY = "id";
     public static final String VIDEOS_ENDPOINT = "videos";
     public static final String REVIEWS_ENDPOINT = "reviews";
 
@@ -47,21 +46,16 @@ public final class NetworkUtils {
     private static final String API_KEY_PARAM = "api_key";
     private static final String API_KEY = BuildConfig.API_KEY;
 
+    // Return a Default Sort Criteria.
     public static String getDefaultSortCriteria() {
         return POPULAR_SORT_CRITERIA;
     }
 
-    /**
-     * Builds the URL used to talk to the server using a API Key & a Sort Criteria.
-     *
-     * @param pathParameter The Sort Criteria that will be queried for.
-     * @return The URL to use to query the server.
-     */
-    public static URL buildUrl(String pathParameter, int movieId) {
-
+    // Builds the URL used to talk to the server using a API Key & a Sort Criteria.
+    public static URL buildUrl(String pathToAppend, int movieId) {
         String stringUri = BASE_URL;
 
-        switch (pathParameter) {
+        switch (pathToAppend) {
             case POPULAR_SORT_CRITERIA:
                 stringUri += POPULAR_SORT_CRITERIA;
                 break;
@@ -76,9 +70,7 @@ public final class NetworkUtils {
                 break;
         }
 
-        Uri uri = Uri.parse(stringUri).buildUpon()
-                .appendQueryParameter(API_KEY_PARAM, API_KEY)
-                .build();
+        Uri uri = Uri.parse(stringUri).buildUpon().appendQueryParameter(API_KEY_PARAM, API_KEY).build();
 
         URL url = null;
         try {
@@ -115,5 +107,4 @@ public final class NetworkUtils {
             urlConnection.disconnect();
         }
     }
-
 }

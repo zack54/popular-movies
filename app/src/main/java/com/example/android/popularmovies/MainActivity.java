@@ -30,7 +30,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +42,7 @@ import com.example.android.popularmovies.utilities.NetworkUtils;
 /**
  * Displays a grid of Movie Posters.
  * Implements MoviesAdapter.OnClickListener - so it can handle RecyclerView items Clicks.
- * Implements FetchDataAsyncTask.OnFetchDataTaskListener - so it can be invoked after AsyncTask Completed
+ * Implements LoaderManager.LoaderCallbacks<Bundle[]> - so it can be invoked after Loader Completed
  */
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnClickListener,
         LoaderManager.LoaderCallbacks<Bundle[]> {
@@ -74,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         // Restore the Activity's State
         restoreInstanceState(savedInstanceState);
 
+        // Sets the Activity Title to Current Sort Criteria.
+        setActivityTitle();
+
         // Load the Data.
         loadData(mCurrentSortCriteria, INITIALIZE_LOADING);
     }
@@ -100,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         } else {
             mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
         }
-        setActivityTitle();
     }
 
     // Helper Method - Sets the Activity Tiles.
@@ -140,38 +141,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
         switch (sortCriteria) {
             case NetworkUtils.FAVORITE_CRITERIA:
-
-                // TODO: implement ...
-                // TODO: solve case empty database ...
-                switch (flag) {
-                    case INITIALIZE_LOADING:
-                        getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                        return;
-                    case RESTART_LOADING:
-                        getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                        return;
-                }
-
-                // TODO: delete
-                // Toast.makeText(this, "Need to implement Favorite Movies", Toast.LENGTH_SHORT).show();
-                // mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
-                //
-
+                startLoader(bundle, flag);
                 return;
             case NetworkUtils.POPULAR_SORT_CRITERIA:
             case NetworkUtils.TOP_RATED_SORT_CRITERIA:
                 if (connectedToInternet()) {
-                    switch (flag) {
-                        case INITIALIZE_LOADING:
-                            getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                            return;
-                        case RESTART_LOADING:
-                            getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle, this);
-                    }
+                    startLoader(bundle, flag);
                 } else {
                     mActivityMainBinding.mainLoadingIndicator.setVisibility(View.INVISIBLE);
                     showConnectionErrorMessage();
                 }
+        }
+    }
+
+    // Helper Method - Initialize/Restart the Loader based on the flag.
+    private void startLoader(Bundle bundle, String flag) {
+        switch (flag) {
+            case INITIALIZE_LOADING:
+                getSupportLoaderManager().initLoader(FETCH_MOVIES_LOADER_ID, bundle,
+                        this);
+                break;
+            case RESTART_LOADING:
+                getSupportLoaderManager().restartLoader(FETCH_MOVIES_LOADER_ID, bundle,
+                        this);
+                break;
         }
     }
 
@@ -196,9 +189,9 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     // Instantiates a New Loader for given ID.
     @NonNull
     @Override
-    public Loader<Bundle[]> onCreateLoader(int loaderID, @Nullable Bundle args) {
-        assert args != null;
-        return new FetchMovies(this, args.getString(NetworkUtils.CRITERIA_KEY));
+    public Loader<Bundle[]> onCreateLoader(int loaderID, @Nullable Bundle bundle) {
+        assert bundle != null;
+        return new FetchMovies(this, bundle.getString(NetworkUtils.CRITERIA_KEY));
     }
 
     // Updates the UI with the Loader Results after Network has Completed.
@@ -209,7 +202,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
             showData();
             mMoviesAdapter.setmMovies(data, mCurrentSortCriteria);
             if (data.length == 0 && mCurrentSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
-                Toast.makeText(this, "You have't Saved any Movie to Favorite", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.main_empty_favorite_movies,
+                        Toast.LENGTH_SHORT).show();
             }
         } else {
             showLoadingErrorMessage();
@@ -245,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
         mActivityMainBinding.mainConnectionErrorMessage.setVisibility(View.VISIBLE);
     }
-
 
     // Handles RecyclerView items Clicks - Launches the detail activity for the correct Movie.
     @Override

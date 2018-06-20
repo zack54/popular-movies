@@ -17,17 +17,16 @@
 
 package com.example.android.popularmovies.utilities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import com.example.android.popularmovies.data.FavoriteMoviesContract;
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 
 import java.net.URL;
-import java.util.Arrays;
 
 /**
  * A Separate Background Task to Fetch Movies for a specific Movie.
@@ -37,14 +36,15 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
 
     // Member Variable - Holds & Caches the Result of the load.
     private Bundle[] mMovies;
+    @SuppressLint("StaticFieldLeak")
     private Context mContext;
-    private final String mPathParameter;
+    private final String mSortCriteria;
 
     // Public Constructor.
-    public FetchMovies(Context context, String pathParameter) {
+    public FetchMovies(Context context, String sortCriteria) {
         super(context);
         mContext = context;
-        mPathParameter = pathParameter;
+        mSortCriteria = sortCriteria;
     }
 
     // Returns the Cached Result is it exist, Otherwise Force the Load.
@@ -61,12 +61,12 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
     @Override
     public Bundle[] loadInBackground() {
         // If there's no sort criteria, there's nothing to look up.
-        if (mPathParameter == null) return null;
+        if (mSortCriteria == null) return null;
 
-        if (mPathParameter.equals(NetworkUtils.FAVORITE_CRITERIA))
+        if (mSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA))
             return getMoviesBundlesFromDatabase();
 
-        URL url = NetworkUtils.buildUrl(mPathParameter, 0);
+        URL url = NetworkUtils.buildUrl(mSortCriteria, 0);
 
         try {
             String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
@@ -80,23 +80,29 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
     // Helper Method - Gets Movies Bundles from Database.
     private Bundle[] getMoviesBundlesFromDatabase() {
         Bundle[] movies = new Bundle[0];
-        Cursor cursor = mContext.getContentResolver()
-                .query(FavoriteMoviesContract.Movies.CONTENT_URI,
-                        null,
-                        null,
-                        null,
-                        null);
+        Cursor cursor = mContext.getContentResolver().query(
+                FavoriteMoviesContract.Movies.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
         if (cursor != null) {
             movies = new Bundle[cursor.getCount()];
             if (cursor.moveToFirst()) {
                 do {
                     Bundle movieBundle = new Bundle();
-                    movieBundle.putInt(JsonUtils.MOVIE_ID, cursor.getInt(cursor.getColumnIndex(Movies.COLUMN_ID)));
-                    movieBundle.putDouble(JsonUtils.MOVIE_VOTE_AVERAGE, cursor.getDouble(cursor.getColumnIndex(Movies.COLUMN_VOTE_AVERAGE)));
-                    movieBundle.putByteArray(JsonUtils.MOVIE_POSTER, cursor.getBlob(cursor.getColumnIndex(Movies.COLUMN_POSTER)));
-                    movieBundle.putString(JsonUtils.MOVIE_ORIGINAL_TITLE, cursor.getString(cursor.getColumnIndex(Movies.COLUMN_ORIGINAL_TITLE)));
-                    movieBundle.putString(JsonUtils.MOVIE_OVERVIEW, cursor.getString(cursor.getColumnIndex(Movies.COLUMN_OVERVIEW)));
-                    movieBundle.putString(JsonUtils.MOVIE_RELEASE_DATE, cursor.getString(cursor.getColumnIndex(Movies.COLUMN_RELEASE_DATE)));
+                    movieBundle.putInt(JsonUtils.MOVIE_ID,
+                            cursor.getInt(cursor.getColumnIndex(Movies.COLUMN_ID)));
+                    movieBundle.putDouble(JsonUtils.MOVIE_VOTE_AVERAGE,
+                            cursor.getDouble(cursor.getColumnIndex(Movies.COLUMN_VOTE_AVERAGE)));
+                    movieBundle.putByteArray(JsonUtils.MOVIE_POSTER,
+                            cursor.getBlob(cursor.getColumnIndex(Movies.COLUMN_POSTER)));
+                    movieBundle.putString(JsonUtils.MOVIE_ORIGINAL_TITLE,
+                            cursor.getString(cursor.getColumnIndex(Movies.COLUMN_ORIGINAL_TITLE)));
+                    movieBundle.putString(JsonUtils.MOVIE_OVERVIEW,
+                            cursor.getString(cursor.getColumnIndex(Movies.COLUMN_OVERVIEW)));
+                    movieBundle.putString(JsonUtils.MOVIE_RELEASE_DATE,
+                            cursor.getString(cursor.getColumnIndex(Movies.COLUMN_RELEASE_DATE)));
 
                     movies[cursor.getPosition()] = movieBundle;
                 } while (cursor.moveToNext());
