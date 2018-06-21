@@ -39,15 +39,17 @@ public final class FetchPoster {
     public static final String SMALL_IMAGE_SIZE = "w185";
     public static final String X_SMALL_IMAGE_SIZE = "w154";
 
-    // Fetches & Loads an Image into an ImageView.
-    public static Bitmap getPosterBitmap(String relativePath, String size) {
+    // Fetches & Loads an Image into an ImageView - Return the Downloaded Image.
+    public static Bitmap intoImageViewAndReturnBitmap(final ImageView imageView,
+                                                      String relativePath, String size) {
 
         String mFullImagePath = IMAGE_BASE_URL + size + relativePath;
-
         final Bitmap[] imageBitmap = new Bitmap[1];
+
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                imageView.setImageBitmap(bitmap);
                 imageBitmap[0] = bitmap;
             }
 
@@ -67,6 +69,7 @@ public final class FetchPoster {
         return imageBitmap[0];
     }
 
+    // Fetches & Loads an Image into an ImageView.
     public static void intoImageView(ImageView imageView, String relativePath, String size) {
         String mFullImagePath = IMAGE_BASE_URL + size + relativePath;
         Picasso.get().load(mFullImagePath).into(imageView);

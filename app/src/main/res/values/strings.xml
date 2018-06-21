@@ -26,7 +26,7 @@
     <string name="main_favorite_option_menu">Favorite Movies</string>
     <string name="main_empty_favorite_movies">You have\'t Saved any Movie to Favorite</string>
 
-    <string name="detail_error_message">Movie data not available</string>
+    <string name="detail_open_error_message">Movie data not available</string>
     <string name="detail_trailers_label">Trailers:</string>
     <string name="detail_trailer_label">Trailer</string>
     <string name="detail_reviews_label">Reviews:</string>

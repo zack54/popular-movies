@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
     // Member Variable - Holds references to the Views in Main Activity Layout.
     private ActivityMainBinding mActivityMainBinding;
-
     private MoviesAdapter mMoviesAdapter;
 
     // Member Variable - Saves the activity's state by Storing the Current Sort Criteria.
