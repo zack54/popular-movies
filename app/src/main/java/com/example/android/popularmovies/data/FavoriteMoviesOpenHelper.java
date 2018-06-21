@@ -62,9 +62,21 @@ public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
                         FavoriteMoviesContract.Movies.TABLE_NAME + "(" + FavoriteMoviesContract.Movies.COLUMN_ID + ")" +
                         ");";
 
+        // Defines a simple SQL Statement that will create a Reviews Table.
+        final String SQL_CREATE_REVIEWS_TABLE =
+                "CREATE TABLE " + FavoriteMoviesContract.Reviews.TABLE_NAME + " (" +
+                        FavoriteMoviesContract.Reviews._ID + " INTEGER PRIMARY KEY, " +
+                        FavoriteMoviesContract.Reviews.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL," +
+                        FavoriteMoviesContract.Reviews.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL," +
+                        FavoriteMoviesContract.Reviews.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
+                        "FOREIGN KEY(" + FavoriteMoviesContract.Reviews.COLUMN_MOVIE_ID + ")" + " REFERENCES " +
+                        FavoriteMoviesContract.Movies.TABLE_NAME + "(" + FavoriteMoviesContract.Movies.COLUMN_ID + ")" +
+                        ");";
+
         // Executes the SQL Statement - Creates the DataBase's Tables.
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_VIDEOS_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_REVIEWS_TABLE);
     }
 
     // Updates the Database's Schema - Called when Database's Version is incremented.
@@ -74,6 +86,7 @@ public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
         // Drops Current Database's Tables then Re-Creates it (since it only cache data stored online)
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteMoviesContract.Movies.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteMoviesContract.Videos.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteMoviesContract.Reviews.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

@@ -52,15 +52,9 @@ public class FavoriteMoviesContract {
         // Constants - Defines the Table's Path & Content URI & to Access the Table's Data.
         public static final String PATH = TABLE_NAME;
         public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH).build();
-
-        // Constants - Defines the MIME Type of the Content being accessed.
-        public static final String MOVIES_DIRECTORY_TYPE =
-                "vnd.android.cursor.dir/" + AUTHORITY + "." + PATH;
-        public static final String MOVIE_ITEM_TYPE =
-                "vnd.android.cursor.item/" + AUTHORITY + "." + PATH;
     }
 
-    // Inner Class - Defines the Videos Table's Constants -
+    // Inner Class - Defines the Videos Table's Constants.
     public static final class Videos implements BaseColumns {
 
         // Constant - Defines the Table's Name.
@@ -73,11 +67,21 @@ public class FavoriteMoviesContract {
         // Constants - Defines the Table's Path & Content URI & to Access the Table's Data.
         public static final String PATH = TABLE_NAME;
         public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH).build();
+    }
 
-        // Constants - Defines the MIME Type of the Content being accessed.
-        public static final String MOVIES_DIRECTORY_TYPE =
-                "vnd.android.cursor.dir/" + AUTHORITY + "." + PATH;
-        public static final String MOVIE_ITEM_TYPE =
-                "vnd.android.cursor.item/" + AUTHORITY + "." + PATH;
+    // Inner Class - Defines the Reviews Table's Constants -
+    public static final class Reviews implements BaseColumns {
+
+        // Constant - Defines the Table's Name.
+        public static final String TABLE_NAME = "reviews";
+
+        // Constant - Defines the Columns's Name.
+        public static final String COLUMN_REVIEW_AUTHOR = "review_author";
+        public static final String COLUMN_REVIEW_CONTENT = "review_content";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+
+        // Constants - Defines the Table's Path & Content URI & to Access the Table's Data.
+        public static final String PATH = TABLE_NAME;
+        public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH).build();
     }
 }

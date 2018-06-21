@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 
 import static com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 import static com.example.android.popularmovies.data.FavoriteMoviesContract.Videos;
+import static com.example.android.popularmovies.data.FavoriteMoviesContract.Reviews;
 
 
 /**
@@ -41,6 +42,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
     public static final int MOVIES_CODE = 100;
     public static final int MOVIE_WITH_ID_CODE = 101;
     public static final int VIDEOS_CODE = 200;
+    public static final int REVIEWS_CODE = 300;
 
     // Member Variable - Stores the URI Matcher.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -58,6 +60,8 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Movies.PATH, MOVIES_CODE);
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Movies.PATH + "/#", MOVIE_WITH_ID_CODE);
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Videos.PATH, VIDEOS_CODE);
+        uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Reviews.PATH, REVIEWS_CODE);
+
         return uriMatcher;
     }
 
@@ -105,6 +109,15 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                         null,
                         null);
                 break;
+            case REVIEWS_CODE:
+                returnedCursor = favoriteMoviesDatabase.query(Reviews.TABLE_NAME,
+                        projection,
+                        Reviews.COLUMN_MOVIE_ID + " = ?",
+                        selectionArgs,
+                        null,
+                        null,
+                        null);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -136,7 +149,15 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
             case VIDEOS_CODE:
                 long videoId = favoriteMoviesDatabase.insert(Videos.TABLE_NAME, null, values);
                 if (videoId != -1) {
-                    returnedUri = ContentUris.withAppendedId(Movies.CONTENT_URI, videoId);
+                    returnedUri = ContentUris.withAppendedId(Videos.CONTENT_URI, videoId);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            case REVIEWS_CODE:
+                long reviewId = favoriteMoviesDatabase.insert(Reviews.TABLE_NAME, null, values);
+                if (reviewId != -1) {
+                    returnedUri = ContentUris.withAppendedId(Reviews.CONTENT_URI, reviewId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -166,6 +187,16 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                         Movies.COLUMN_ID + " = ?",
                         selectionArgs);
                 break;
+            case VIDEOS_CODE:
+                rowsDeleted = favoriteMoviesDatabase.delete(Videos.TABLE_NAME,
+                        Videos.COLUMN_MOVIE_ID + " = ?",
+                        selectionArgs);
+                break;
+            case REVIEWS_CODE:
+                rowsDeleted = favoriteMoviesDatabase.delete(Reviews.TABLE_NAME,
+                        Reviews.COLUMN_MOVIE_ID + " = ?",
+                        selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -188,14 +219,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        switch (sUriMatcher.match(uri)) {
-            case MOVIES_CODE:
-                return Movies.MOVIES_DIRECTORY_TYPE;
-            case MOVIE_WITH_ID_CODE:
-                return Movies.MOVIE_ITEM_TYPE;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
+        throw new RuntimeException("We are not implementing getType in Sunshine.");
     }
 
     // Closes the Database.

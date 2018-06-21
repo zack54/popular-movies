@@ -43,7 +43,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.data.FavoriteMoviesContract;
+import com.example.android.popularmovies.data.FavoriteMoviesContract.Reviews;
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Videos;
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
 import com.example.android.popularmovies.databinding.ActivityDetailBinding;
@@ -76,12 +76,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Member Variables - Saves the Activity's state for Runtime Configuration changes.
     private Bundle mCurrentMovie;
     private String mCurrentSortCriteria;
-    private boolean mIsFavoriteMovie;
+    private boolean mMovieIsFavorite;
     private byte[] mCurrentMovieImageBytes;
     private String mCurrentMovieId;
     private Uri mCurrentMovieUri;
 
-    private String[] mCurrentVideo;
+    private String[] mCurrentVideos;
+    private ContentValues[] mCurrentReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         loadMoreData();
     }
 
+
     // Helper Method - Setups the ListViews' Adapters.
     private void setupListViews(Context context) {
         mVideosAdapter = new VideosAdapter(context);
@@ -116,6 +118,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mReviewsAdapter = new ReviewsAdapter(context);
         mActivityDetailBinding.detailReviews.setAdapter(mReviewsAdapter);
     }
+
 
     // Helper Method - Shows the Up Navigation as an action button in the Action Bar.
     private void addUpNavigationButton() {
@@ -137,6 +140,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+
     // Helper Method - Restores Current SortCriteria on Orientation or Set to Default SortCriteria.
     private void restoreInstanceState(Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -144,19 +148,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         if (savedInstanceState != null) {
             mCurrentMovie = savedInstanceState.getBundle(MOVIE_BUNDLE_KEY);
             mCurrentSortCriteria = savedInstanceState.getString(NetworkUtils.CRITERIA_KEY);
-            mIsFavoriteMovie = savedInstanceState.getBoolean(FAVORITE_MOVIE_KEY);
+            mMovieIsFavorite = savedInstanceState.getBoolean(FAVORITE_MOVIE_KEY);
             mCurrentMovieImageBytes = savedInstanceState.getByteArray(MOVIE_IMAGE_BYTES);
-            mCurrentVideo = savedInstanceState.getStringArray(VIDEOS_KEY);
+            mCurrentVideos = savedInstanceState.getStringArray(VIDEOS_KEY);
         } else if (intent == null) {
             closeActivityOnError();
         } else {
             mCurrentMovie = intent.getExtras();
             mCurrentSortCriteria = intent.getStringExtra(NetworkUtils.CRITERIA_KEY);
             if (mCurrentSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
-                mIsFavoriteMovie = true;
-                mCurrentMovieImageBytes = mCurrentMovie.getByteArray(Movies.COLUMN_POSTER);
-                // TODO ...
-                // mCurrentVideo = ...
+                mMovieIsFavorite = true;
+                mCurrentMovieImageBytes = mCurrentMovie.getByteArray(JsonUtils.MOVIE_POSTER);
             }
         }
 
@@ -164,7 +166,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             closeActivityOnError();
         } else {
             mCurrentMovieId = String.valueOf(mCurrentMovie.getInt(JsonUtils.MOVIE_ID));
-            mCurrentMovieUri = FavoriteMoviesContract.Movies.CONTENT_URI.buildUpon()
+            mCurrentMovieUri = Movies.CONTENT_URI.buildUpon()
                     .appendPath(mCurrentMovieId)
                     .build();
         }
@@ -175,9 +177,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBundle(MOVIE_BUNDLE_KEY, mCurrentMovie);
         outState.putString(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
-        outState.putBoolean(FAVORITE_MOVIE_KEY, mIsFavoriteMovie);
+        outState.putBoolean(FAVORITE_MOVIE_KEY, mMovieIsFavorite);
         outState.putByteArray(MOVIE_IMAGE_BYTES, mCurrentMovieImageBytes);
-        outState.putStringArray(VIDEOS_KEY, mCurrentVideo);
+        outState.putStringArray(VIDEOS_KEY, mCurrentVideos);
         super.onSaveInstanceState(outState);
     }
 
@@ -186,6 +188,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         finish();
         Toast.makeText(this, R.string.detail_open_error_message, Toast.LENGTH_SHORT).show();
     }
+
 
     // Helper Method - Populates the Movie's Basic Data (Title, Release Date, Vote Average, Overview)
     private void loadBasicData() {
@@ -204,7 +207,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private void loadMoreData() {
 
         // Checks is the Current Movie is a Favorite movie.
-        if (mIsFavoriteMovie || isInMoviesTable()) {
+        if (mMovieIsFavorite || movieIsInMoviesTable()) {
 
             // Switch the Button to Delete.
             setButtonToDelete();
@@ -213,11 +216,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             Bitmap imageBitmap = BitmapUtility.getImage(mCurrentMovieImageBytes);
             mActivityDetailBinding.detailPoster.setImageBitmap(imageBitmap);
 
-            String[] videos = getMovieTrailers();
+            // Sets the Movie's Trailers.
+            String[] videos = getTrailersFromVideosTable();
             displayVideos(videos);
 
-            // TODO: query Reviews Tables & populate of the rest of the UI.
-            // ...
+            // Sets the Movies's Reviews.
+            ContentValues[] reviews = getReviewsFromReviewsTable();
+            displayReviews(reviews);
 
             // When Current Movie is Not in Database.
         } else {
@@ -236,24 +241,49 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
             // Fetch the Movie's Videos & Reviews from the Cloud.
             LoaderManager loaderManager = getSupportLoaderManager();
-            loaderManager.initLoader(FETCH_VIDEOS_LOADER_ID, mCurrentMovie, this);
-            loaderManager.initLoader(FETCH_REVIEWS_LOADER_ID, mCurrentMovie, this);
+            loaderManager.restartLoader(FETCH_VIDEOS_LOADER_ID, mCurrentMovie, this);
+            loaderManager.restartLoader(FETCH_REVIEWS_LOADER_ID, mCurrentMovie, this);
 
-            // Re-Adjusts the ListViews Height on Screen Rotation.
-            if (!loaderManager.hasRunningLoaders()) {
-                loaderManager.getLoader(FETCH_VIDEOS_LOADER_ID).forceLoad();
-                loaderManager.getLoader(FETCH_REVIEWS_LOADER_ID).forceLoad();
-            }
+//            // Re-Adjusts the ListViews Height on Screen Rotation.
+//            if (!loaderManager.hasRunningLoaders()) {
+//                loaderManager.getLoader(FETCH_VIDEOS_LOADER_ID).forceLoad();
+//                loaderManager.getLoader(FETCH_REVIEWS_LOADER_ID).forceLoad();
+//            }
         }
     }
 
-    // ...
-    private String[] getMovieTrailers() {
+    // TODO: find out how to move it to the background thread not to slow main thread ....
+    // Helper Method - Query the Movies Table to Check if Movie is Favorite, if so Store its Poster.
+    private boolean movieIsInMoviesTable() {
+        String[] selectionArgs = {mCurrentMovieId};
+        Cursor cursor = mContentResolver.query(
+                mCurrentMovieUri,
+                null,
+                null,
+                selectionArgs,
+                null);
+
+        if (cursor != null) {
+            if (cursor.getCount() != 0) {
+
+                // Get image from the Database - Sets mMovieIsFavorite & mCurrentMovieImageBytes.
+                if (cursor.moveToFirst()) {
+                    mCurrentMovieImageBytes = cursor.getBlob(cursor.getColumnIndex(Movies.COLUMN_POSTER));
+                }
+                mMovieIsFavorite = true;
+            }
+            cursor.close();
+        }
+        return mMovieIsFavorite;
+    }
+
+    // Helper Method - Query the Videos Table to Get the correct Trailers & Update local reference.
+    private String[] getTrailersFromVideosTable() {
         String[] videos = new String[0];
 
         String[] selectionArgs = {mCurrentMovieId};
         Cursor cursor = mContentResolver.query(
-                FavoriteMoviesContract.Videos.CONTENT_URI,
+                Videos.CONTENT_URI,
                 null,
                 null,
                 selectionArgs,
@@ -266,36 +296,40 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     videos[cursor.getPosition()] = cursor.getString(cursor.getColumnIndex(Videos.COLUMN_VIDEO_PATH));
                 } while (cursor.moveToNext());
             }
+            mCurrentVideos = videos;
             cursor.close();
         }
-
         return videos;
     }
 
-    // TODO: find out how to move it to the background thread not to slow main thread ....
-    // Check if Movie is in Database, then Stores the current movie's Image.
-    private boolean isInMoviesTable() {
+    // Helper Method - Query the Reviews Table to Get the correct Reviews & Update local reference.
+    private ContentValues[] getReviewsFromReviewsTable() {
+        ContentValues[] reviews = new ContentValues[0];
+
         String[] selectionArgs = {mCurrentMovieId};
         Cursor cursor = mContentResolver.query(
-                mCurrentMovieUri,
+                Reviews.CONTENT_URI,
                 null,
                 null,
                 selectionArgs,
                 null);
 
         if (cursor != null) {
-            if (cursor.getCount() != 0) {
-
-                // Get image from the Database - Sets mIsFavoriteMovie & mCurrentMovieImageBytes.
-                if (cursor.moveToFirst()) {
-                    mCurrentMovieImageBytes = cursor.getBlob(cursor.getColumnIndex(Movies.COLUMN_POSTER));
-                }
-                mIsFavoriteMovie = true;
+            reviews = new ContentValues[cursor.getCount()];
+            if (cursor.moveToFirst()) {
+                do {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(JsonUtils.REVIEW_AUTHOR, cursor.getString(cursor.getColumnIndex(Reviews.COLUMN_REVIEW_AUTHOR)));
+                    contentValues.put(JsonUtils.REVIEW_CONTENT, cursor.getString(cursor.getColumnIndex(Reviews.COLUMN_REVIEW_CONTENT)));
+                    reviews[cursor.getPosition()] = contentValues;
+                } while (cursor.moveToNext());
             }
+            mCurrentReviews = reviews;
             cursor.close();
         }
-        return mIsFavoriteMovie;
+        return reviews;
     }
+
 
     // Helper Method - Updates the Button's Text & Color at Runtime.
     private void setButtonToDelete() {
@@ -308,6 +342,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mActivityDetailBinding.detailButton.setText(getResources().getString(R.string.detail_add_to_favorite));
         mActivityDetailBinding.detailButton.setBackgroundColor(getResources().getColor(R.color.color_add));
     }
+
 
     // Instantiates a Loader for a given ID.
     @NonNull
@@ -331,10 +366,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         int loaderId = loader.getId();
         switch (loaderId) {
             case FETCH_VIDEOS_LOADER_ID:
-                displayVideos(loadResults);
+                if (loadResults != null && loadResults instanceof String[]) {
+                    String[] videos = (String[]) loadResults;
+                    mCurrentVideos = videos;
+                    displayVideos(videos);
+                }
                 return;
             case FETCH_REVIEWS_LOADER_ID:
-                displayReviews(loadResults);
+                if (loadResults != null && loadResults instanceof ContentValues[]) {
+                    ContentValues[] reviews = (ContentValues[]) loadResults;
+                    mCurrentReviews = reviews;
+                    displayReviews(reviews);
+                }
                 return;
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loader);
@@ -347,9 +390,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         int loaderId = loader.getId();
         switch (loaderId) {
             case FETCH_VIDEOS_LOADER_ID:
+                mCurrentVideos = null;
                 mVideosAdapter.setmVideos(null);
                 return;
             case FETCH_REVIEWS_LOADER_ID:
+                // ...
                 mReviewsAdapter.setmReviews(null);
                 return;
             default:
@@ -358,29 +403,24 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     // Helper Method - Displays the list of Videos.
-    private void displayVideos(Object loadResults) {
-        if (loadResults != null && loadResults instanceof String[]) {
-            String[] videos = (String[]) loadResults;
-            mCurrentVideo = videos;
-            mVideosAdapter.setmVideos(videos);
+    private void displayVideos(String[] videos) {
+        mVideosAdapter.setmVideos(videos);
 
-            LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailVideos, mVideosAdapter);
-            mActivityDetailBinding.detailVideos.setLayoutParams(params);
-            mActivityDetailBinding.detailVideos.requestLayout();
-        }
+        LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailVideos, mVideosAdapter);
+        mActivityDetailBinding.detailVideos.setLayoutParams(params);
+        mActivityDetailBinding.detailVideos.requestLayout();
     }
 
     // Helper Method - Displays the list of Reviews.
-    private void displayReviews(Object loadResults) {
-        if (loadResults != null && loadResults instanceof ContentValues[]) {
-            ContentValues[] reviews = (ContentValues[]) loadResults;
-            mReviewsAdapter.setmReviews(reviews);
+    private void displayReviews(ContentValues[] reviews) {
+        mReviewsAdapter.setmReviews(reviews);
 
-            LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailReviews, mReviewsAdapter);
-            mActivityDetailBinding.detailReviews.setLayoutParams(params);
-            mActivityDetailBinding.detailReviews.requestLayout();
-        }
+        LayoutParams params = adjustListViewHeight(mActivityDetailBinding.detailReviews, mReviewsAdapter);
+        mActivityDetailBinding.detailReviews.setLayoutParams(params);
+        mActivityDetailBinding.detailReviews.requestLayout();
     }
+
+
 
     // Helper Method - Adjusts the ListView Height.
     private LayoutParams adjustListViewHeight(ListView listView, ArrayAdapter adapter) {
@@ -399,9 +439,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
+
     // Handles Favorite Button Click events.
     public void favoriteButtonClickListener(View view) {
-        if (mIsFavoriteMovie) {
+        if (mMovieIsFavorite) {
             deleteMovieFromFavorite();
         } else {
             addMovieToFavorite();
@@ -411,11 +452,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Helper Method - Deletes a Movie from the Favorite Database.
     private void deleteMovieFromFavorite() {
         String[] selectionArgs = {mCurrentMovieId};
+
         int rowsDeleted = mContentResolver.delete(mCurrentMovieUri, null, selectionArgs);
+        mContentResolver.delete(Videos.CONTENT_URI, null, selectionArgs);
+        mContentResolver.delete(Reviews.CONTENT_URI, null, selectionArgs);
 
         if (rowsDeleted != 0) {
             Toast.makeText(this, "Movie Deleted From Favorite Successfully", Toast.LENGTH_SHORT).show();
-            mIsFavoriteMovie = false;
+            mMovieIsFavorite = false;
             setButtonToAdd();
         } else {
             Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
@@ -425,7 +469,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Helper Method - Inserts a Movie from into the Favorite Database.
     private void addMovieToFavorite() {
 
-        // Map Bundle to ContentValues.
+        // Add a Movie to Movies Table.
         ContentValues movieValues = new ContentValues();
         movieValues.put(Movies.COLUMN_ID, mCurrentMovie.getInt(JsonUtils.MOVIE_ID));
         movieValues.put(Movies.COLUMN_VOTE_AVERAGE, mCurrentMovie.getDouble(JsonUtils.MOVIE_VOTE_AVERAGE));
@@ -436,24 +480,31 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         Uri movieReturnedUri = mContentResolver.insert(Movies.CONTENT_URI, movieValues);
 
+        // Add the Movie's Trailers to Videos Table.
+        for (String video : mCurrentVideos) {
+            ContentValues videoValue = new ContentValues();
+            videoValue.put(Videos.COLUMN_VIDEO_PATH, video);
+            videoValue.put(Videos.COLUMN_MOVIE_ID, Integer.valueOf(mCurrentMovieId));
+
+            Uri videoReturnedUri = mContentResolver.insert(Videos.CONTENT_URI, videoValue);
+        }
+
+        // Add the Movie's Reviews to Reviews Table.
+        for (ContentValues review : mCurrentReviews) {
+            ContentValues reviewValue = new ContentValues();
+            reviewValue.put(Reviews.COLUMN_REVIEW_AUTHOR, review.getAsString(JsonUtils.REVIEW_AUTHOR));
+            reviewValue.put(Reviews.COLUMN_REVIEW_CONTENT, review.getAsString(JsonUtils.REVIEW_CONTENT));
+            reviewValue.put(Reviews.COLUMN_MOVIE_ID, Integer.valueOf(mCurrentMovieId));
+
+            Uri reviewReturnedUri = mContentResolver.insert(Reviews.CONTENT_URI, reviewValue);
+        }
+
         if (movieReturnedUri != null) {
             Toast.makeText(this, "Movie Added to Favorites Successfully", Toast.LENGTH_SHORT).show();
-            mIsFavoriteMovie = true;
+            mMovieIsFavorite = true;
             setButtonToDelete();
         } else {
             Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
         }
-
-        for (int i = 0; i < mCurrentVideo.length; i++) {
-            ContentValues videosValue = new ContentValues();
-            videosValue.put(Videos.COLUMN_VIDEO_PATH, mCurrentVideo[i]);
-            videosValue.put(Videos.COLUMN_MOVIE_ID, Integer.valueOf(mCurrentMovieId));
-
-            Uri videoReturnedUri = mContentResolver.insert(Videos.CONTENT_URI, videosValue);
-        }
-
-
-
-
     }
 }
