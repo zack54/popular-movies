@@ -60,8 +60,7 @@ public class VideosAdapter extends ArrayAdapter<String> {
             rowView = inflater.inflate(R.layout.detail_video_item, parent, false);
 
             TextView videoView = rowView.findViewById(R.id.detail_video_number);
-            String trailerNumber = mContext.getString(R.string.detail_trailer_label)
-                    + " " + String.valueOf(position + 1);
+            String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " + String.valueOf(position + 1);
             videoView.setText(trailerNumber);
 
             handleItemClickEvent(rowView, position);

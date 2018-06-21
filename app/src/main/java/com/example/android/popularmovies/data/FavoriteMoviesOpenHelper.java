@@ -42,9 +42,8 @@ public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        // Defines a simple SQL Statement that will create a Table that will cache the Data.
+        // Defines a simple SQL Statement that will create a Movies Table.
         final String SQL_CREATE_MOVIES_TABLE =
-
                 "CREATE TABLE " + FavoriteMoviesContract.Movies.TABLE_NAME + " (" +
                         FavoriteMoviesContract.Movies.COLUMN_ID + " INTEGER PRIMARY KEY, " +
                         FavoriteMoviesContract.Movies.COLUMN_VOTE_AVERAGE + " FLOAT NOT NULL, " +
@@ -53,16 +52,28 @@ public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
                         FavoriteMoviesContract.Movies.COLUMN_OVERVIEW + " TEXT NOT NULL," +
                         FavoriteMoviesContract.Movies.COLUMN_RELEASE_DATE + " TINYTEXT NOT NULL);";
 
-        // Executes the SQL Statement - Creates the DataBase's Table.
+        // Defines a simple SQL Statement that will create a Videos Table.
+        final String SQL_CREATE_VIDEOS_TABLE =
+                "CREATE TABLE " + FavoriteMoviesContract.Videos.TABLE_NAME + " (" +
+                        FavoriteMoviesContract.Videos._ID + " INTEGER PRIMARY KEY, " +
+                        FavoriteMoviesContract.Videos.COLUMN_VIDEO_PATH + " TEXT NOT NULL," +
+                        FavoriteMoviesContract.Videos.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
+                        "FOREIGN KEY(" + FavoriteMoviesContract.Videos.COLUMN_MOVIE_ID + ")" + " REFERENCES " +
+                        FavoriteMoviesContract.Movies.TABLE_NAME + "(" + FavoriteMoviesContract.Movies.COLUMN_ID + ")" +
+                        ");";
+
+        // Executes the SQL Statement - Creates the DataBase's Tables.
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_VIDEOS_TABLE);
     }
 
     // Updates the Database's Schema - Called when Database's Version is incremented.
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 
-        // Drops Current Database's Table then Re-Creates it (since it only cache data stored online)
+        // Drops Current Database's Tables then Re-Creates it (since it only cache data stored online)
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteMoviesContract.Movies.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteMoviesContract.Videos.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

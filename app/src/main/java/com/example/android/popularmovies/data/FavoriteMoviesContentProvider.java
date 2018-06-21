@@ -28,6 +28,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import static com.example.android.popularmovies.data.FavoriteMoviesContract.Movies;
+import static com.example.android.popularmovies.data.FavoriteMoviesContract.Videos;
+
 
 /**
  * Loads & Displays Favorite Movies more Efficiently.
@@ -38,6 +40,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
     // Constants - Define Integer Codes for a Table & for a Single Row, Used to match URIs.
     public static final int MOVIES_CODE = 100;
     public static final int MOVIE_WITH_ID_CODE = 101;
+    public static final int VIDEOS_CODE = 200;
 
     // Member Variable - Stores the URI Matcher.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -54,7 +57,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
         // Adds Matches for the Movies Table & for a single Movie by ID.
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Movies.PATH, MOVIES_CODE);
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Movies.PATH + "/#", MOVIE_WITH_ID_CODE);
-
+        uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, Videos.PATH, VIDEOS_CODE);
         return uriMatcher;
     }
 
@@ -93,6 +96,15 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                         null,
                         null);
                 break;
+            case VIDEOS_CODE:
+                returnedCursor = favoriteMoviesDatabase.query(Videos.TABLE_NAME,
+                        projection,
+                        Videos.COLUMN_MOVIE_ID + " = ?",
+                        selectionArgs,
+                        null,
+                        null,
+                        null);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -117,6 +129,14 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                 long id = favoriteMoviesDatabase.insert(Movies.TABLE_NAME, null, values);
                 if (id != -1) {
                     returnedUri = ContentUris.withAppendedId(Movies.CONTENT_URI, id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            case VIDEOS_CODE:
+                long videoId = favoriteMoviesDatabase.insert(Videos.TABLE_NAME, null, values);
+                if (videoId != -1) {
+                    returnedUri = ContentUris.withAppendedId(Movies.CONTENT_URI, videoId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
