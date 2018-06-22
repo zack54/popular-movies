@@ -60,28 +60,28 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
     // Starts Connection & Parse Response.
     @Override
     public Bundle[] loadInBackground() {
+
         // If there's no sort criteria, there's nothing to look up.
-        if (mSortCriteria == null) return null;
-
-        if (mSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA))
-            return getMoviesBundlesFromDatabase();
-
-        URL url = NetworkUtils.buildUrl(mSortCriteria, 0);
-
-        try {
-            String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
-            return JsonUtils.getMoviesBundlesFromJson(jsonString);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (mSortCriteria == null) {
             return null;
+        } else if (mSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
+            return getMoviesBundlesFromDatabase();
+        } else {
+            URL url = NetworkUtils.buildUrl(mSortCriteria, 0);
+            try {
+                String jsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                return JsonUtils.getMoviesBundlesFromJson(jsonString);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
-    // Helper Method - Gets Movies Bundles from Database.
+    // Helper Method - Gets Movies from Database.
     private Bundle[] getMoviesBundlesFromDatabase() {
         Bundle[] movies = new Bundle[0];
-        Cursor cursor = mContext.getContentResolver().query(
-                FavoriteMoviesContract.Movies.CONTENT_URI,
+        Cursor cursor = mContext.getContentResolver().query(FavoriteMoviesContract.Movies.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -91,6 +91,7 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
             if (cursor.moveToFirst()) {
                 do {
                     Bundle movieBundle = new Bundle();
+
                     movieBundle.putInt(JsonUtils.MOVIE_ID,
                             cursor.getInt(cursor.getColumnIndex(Movies.COLUMN_ID)));
                     movieBundle.putDouble(JsonUtils.MOVIE_VOTE_AVERAGE,

@@ -64,7 +64,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         return new ViewHolder(view);
     }
 
-    // Populates & Binds a ViewHolder with the correct Movie's Image.
+    // Populates & Binds the correct Movie's Image from Database/Cloud based on position & Sort Criteria.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Bundle movie = mMovies[position];

@@ -124,6 +124,7 @@
                 android:textStyle="bold"
                 android:gravity="center_vertical"
                 android:paddingTop="8dp"
+                android:paddingBottom="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detail_overview" />
@@ -136,6 +137,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
+                android:nestedScrollingEnabled="true"
+                android:fadeScrollbars="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detail_trailers_label"
@@ -156,6 +159,7 @@
                 android:textStyle="bold"
                 android:gravity="center_vertical"
                 android:paddingTop="8dp"
+                android:paddingBottom="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detail_videos" />
@@ -169,6 +173,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
+                android:nestedScrollingEnabled="true"
+                android:fadeScrollbars="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

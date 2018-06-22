@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         loadData(mCurrentSortCriteria, INITIALIZE_LOADING);
     }
 
+
     // Helper Method - Setups the RecyclerView's LayoutManager based on current Orientation.
     private void setupRecyclerView() {
         GridLayoutManager gridLayoutManager = null;
@@ -94,14 +95,29 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         mActivityMainBinding.mainRecyclerView.setAdapter(mMoviesAdapter);
     }
 
-    // Helper Method - Restores Current SortCriteria on Orientation or Set to Default SortCriteria.
+
+    // Helper Method - Restores Current SortCriteria on Orientation and back from Detail Activity.
     private void restoreInstanceState(Bundle savedInstanceState) {
+        Intent intent = getIntent();
         if (savedInstanceState != null) {
             mCurrentSortCriteria = savedInstanceState.getString(NetworkUtils.CRITERIA_KEY);
-        } else {
-            mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
+        } else if (intent != null) {
+            if (intent.hasExtra(NetworkUtils.CRITERIA_KEY)) {
+                mCurrentSortCriteria = intent.getStringExtra(NetworkUtils.CRITERIA_KEY);
+            } else {
+                mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
+            }
         }
     }
+
+    // Saves the Current Sort Criteria before Orientation.
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
+        super.onSaveInstanceState(outState);
+    }
+
+
 
     // Helper Method - Sets the Activity Tiles.
     private void setActivityTitle() {
@@ -118,15 +134,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         }
     }
 
-    // Saves the Current Sort Criteria before Orientation.
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
-        super.onSaveInstanceState(outState);
-    }
 
-    // Helper Method - Starts Background Task based on Sort Criteria if there is Internet connection
+    // Helper Method - Starts Background Task to Load Data from Database/Cloud based on Sort Criteria.
     private void loadData(String sortCriteria, String flag) {
+
+        // Update the Current Sort Criteria.
+        mCurrentSortCriteria = sortCriteria;
 
         // Prepares the UI Before Network Starts.
         onLoadStarted();
@@ -134,9 +147,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         // Prepares SortCriteria to pass to the Loader.
         Bundle bundle = new Bundle();
         bundle.putString(NetworkUtils.CRITERIA_KEY, sortCriteria);
-
-        // Update the Current Sort Criteria.
-        mCurrentSortCriteria = sortCriteria;
 
         switch (sortCriteria) {
             case NetworkUtils.FAVORITE_CRITERIA:
@@ -178,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         return ((networkInfo != null) && (networkInfo.isConnectedOrConnecting()));
     }
 
+
     // Prepares the UI Before Network Starts.
     public void onLoadStarted() {
         mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
@@ -201,8 +212,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
             showData();
             mMoviesAdapter.setmMovies(data, mCurrentSortCriteria);
             if (data.length == 0 && mCurrentSortCriteria.equals(NetworkUtils.FAVORITE_CRITERIA)) {
-                Toast.makeText(this, R.string.main_empty_favorite_movies,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.main_empty_favorite_movies, Toast.LENGTH_SHORT)
+                        .show();
             }
         } else {
             showLoadingErrorMessage();
@@ -214,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
     public void onLoaderReset(@NonNull Loader<Bundle[]> loader) {
         mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
     }
+
 
     // Helper Method - Makes the Movies Data visible & Hides the Error Messages.
     private void showData() {
@@ -239,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         mActivityMainBinding.mainConnectionErrorMessage.setVisibility(View.VISIBLE);
     }
 
+
     // Handles RecyclerView items Clicks - Launches the detail activity for the correct Movie.
     @Override
     public void onClick(Bundle currentMovie) {
@@ -247,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         detailIntent.putExtra(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
         startActivity(detailIntent);
     }
+
 
     // Adds an Options Menu to Main Activity.
     @Override
