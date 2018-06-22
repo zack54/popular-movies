@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
@@ -128,9 +129,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent mainIntent = new Intent(this, MainActivity.class);
-                mainIntent.putExtra(NetworkUtils.CRITERIA_KEY, mCurrentSortCriteria);
-                startActivity(mainIntent);
+                NavUtils.navigateUpFromSameTask(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -226,7 +225,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    // TODO: Move Database Queries to Background.
     // Helper Method - Query the Movies Table to Check if Movie is Favorite, if so Store its Poster.
     private boolean movieIsInMoviesTable() {
         String[] selectionArgs = {mCurrentMovieId};
@@ -311,7 +309,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mActivityDetailBinding.detailButton.setBackgroundColor(getResources().getColor(R.color.color_add));
     }
 
-
     // Instantiates a Loader based on an ID.
     @NonNull
     @Override
@@ -395,7 +392,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    // TODO: Move Database Queries to Background.
     // Helper Method - Deletes a Movie from the Database.
     private void deleteMovieFromFavorite() {
         String[] selectionArgs = {mCurrentMovieId};

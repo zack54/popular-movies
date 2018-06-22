@@ -124,7 +124,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
 
         // Register the ContentResolver's Listener to watch a Content URI for Changes.
         if (getContext() != null) {
-            returnedCursor.setNotificationUri(getContext().getContentResolver(), Movies.CONTENT_URI);
+            returnedCursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
         return returnedCursor;
     }
@@ -140,7 +140,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case MOVIES_CODE:
                 long id = favoriteMoviesDatabase.insert(Movies.TABLE_NAME, null, values);
-                if (id != -1) {
+                if (id > 0) {
                     returnedUri = ContentUris.withAppendedId(Movies.CONTENT_URI, id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -148,7 +148,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                 break;
             case VIDEOS_CODE:
                 long videoId = favoriteMoviesDatabase.insert(Videos.TABLE_NAME, null, values);
-                if (videoId != -1) {
+                if (videoId > 0) {
                     returnedUri = ContentUris.withAppendedId(Videos.CONTENT_URI, videoId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -156,7 +156,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                 break;
             case REVIEWS_CODE:
                 long reviewId = favoriteMoviesDatabase.insert(Reviews.TABLE_NAME, null, values);
-                if (reviewId != -1) {
+                if (reviewId > 0) {
                     returnedUri = ContentUris.withAppendedId(Reviews.CONTENT_URI, reviewId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -168,7 +168,7 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
 
         // Notifies the Registered Listener that a Row was inserted & Sync Changes.
         if (getContext() != null) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            getContext().getContentResolver().notifyChange(returnedUri, null);
         }
         return returnedUri;
     }

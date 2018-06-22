@@ -95,18 +95,12 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         mActivityMainBinding.mainRecyclerView.setAdapter(mMoviesAdapter);
     }
 
-
     // Helper Method - Restores Current SortCriteria on Orientation and back from Detail Activity.
     private void restoreInstanceState(Bundle savedInstanceState) {
-        Intent intent = getIntent();
         if (savedInstanceState != null) {
             mCurrentSortCriteria = savedInstanceState.getString(NetworkUtils.CRITERIA_KEY);
-        } else if (intent != null) {
-            if (intent.hasExtra(NetworkUtils.CRITERIA_KEY)) {
-                mCurrentSortCriteria = intent.getStringExtra(NetworkUtils.CRITERIA_KEY);
-            } else {
-                mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
-            }
+        } else {
+            mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
         }
     }
 
@@ -289,5 +283,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
         setActivityTitle();
         return true;
+    }
+
+
+    // Refresh the Main Activity to reflect Database Update.
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadData(mCurrentSortCriteria, RESTART_LOADING);
     }
 }

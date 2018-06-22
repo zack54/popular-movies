@@ -78,7 +78,7 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
         }
     }
 
-    // Helper Method - Gets Movies from Database.
+    // Helper Method - Gets Movies from Local Database.
     private Bundle[] getMoviesBundlesFromDatabase() {
         Bundle[] movies = new Bundle[0];
         Cursor cursor = mContext.getContentResolver().query(FavoriteMoviesContract.Movies.CONTENT_URI,
