@@ -20,8 +20,6 @@ package com.example.android.popularmovies.utilities;
 import android.content.ContentValues;
 import android.os.Bundle;
 
-import com.example.android.popularmovies.data.Movie;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,91 +47,7 @@ public class JsonUtils {
 
     public static final String MOVIE_POSTER = "poster";
 
-    /**
-     * Parses JSON String and returns an Array of Movies.
-     *
-     * @param json JSON String.
-     * @return Array of Movies Objects.
-     * @throws JSONException If JSON data cannot be properly parsed.
-     */
-    public static Movie[] getMoviesArrayFromJson(String json) throws JSONException {
-
-        // Constants - Holds the keys needed to extract the info from JSON String.
-        final String MOVIE_ID = "id";
-        final String MOVIE_RESULTS = "results";
-        final String MOVIE_VOTE_AVERAGE = "vote_average";
-        final String MOVIE_POSTER_PATH = "poster_path";
-        final String MOVIE_ORIGINAL_TITLE = "original_title";
-        final String MOVIE_OVERVIEW = "overview";
-        final String MOVIE_RELEASE_DATE = "release_date";
-
-        // Local Variable - Holds an Array of Movies.
-        Movie[] movies;
-
-        if (json == null) {
-            return null;
-        }
-
-        // Gets the List of Movies from the JSON Object.
-        JSONObject jsonObject = new JSONObject(json);
-        JSONArray resultsMovies = jsonObject.getJSONArray(MOVIE_RESULTS);
-
-        // Extracts each Movie's Properties & Adds a Movie Object to the Array of Movies.
-        movies = new Movie[resultsMovies.length()];
-        for (int i = 0; i < resultsMovies.length(); i++) {
-
-            JSONObject movieJSONObject = resultsMovies.getJSONObject(i);
-            int id = movieJSONObject.getInt(MOVIE_ID);
-            double voteAverage = movieJSONObject.getDouble(MOVIE_VOTE_AVERAGE);
-            String posterPath = movieJSONObject.getString(MOVIE_POSTER_PATH);
-            String originalTitle = movieJSONObject.getString(MOVIE_ORIGINAL_TITLE);
-            String overview = movieJSONObject.getString(MOVIE_OVERVIEW);
-            String releaseDate = movieJSONObject.getString(MOVIE_RELEASE_DATE);
-
-            movies[i] = new Movie(id, voteAverage, posterPath, originalTitle, overview, releaseDate);
-        }
-
-        return movies;
-    }
-
-    public static ContentValues[] getMoviesContentValuesFromJson(String json) throws JSONException {
-
-        // Local Variable - Holds an Array of Movies.
-        ContentValues[] movies;
-
-        if (json == null) {
-            return null;
-        }
-
-        // Gets the List of Movies from the JSON Object.
-        JSONObject jsonObject = new JSONObject(json);
-        JSONArray resultsMovies = jsonObject.getJSONArray(MOVIE_RESULTS);
-
-        // Extracts each Movie's Properties & Adds a Movie Object to the Array of Movies.
-        movies = new ContentValues[resultsMovies.length()];
-        for (int i = 0; i < resultsMovies.length(); i++) {
-
-            JSONObject movieJSONObject = resultsMovies.getJSONObject(i);
-            int id = movieJSONObject.getInt(MOVIE_ID);
-            double voteAverage = movieJSONObject.getDouble(MOVIE_VOTE_AVERAGE);
-            String posterPath = movieJSONObject.getString(MOVIE_POSTER_PATH);
-            String originalTitle = movieJSONObject.getString(MOVIE_ORIGINAL_TITLE);
-            String overview = movieJSONObject.getString(MOVIE_OVERVIEW);
-            String releaseDate = movieJSONObject.getString(MOVIE_RELEASE_DATE);
-
-            ContentValues movieValues = new ContentValues();
-            movieValues.put(MOVIE_ID, id);
-            movieValues.put(MOVIE_VOTE_AVERAGE, voteAverage);
-            movieValues.put(MOVIE_POSTER_PATH, posterPath);
-            movieValues.put(MOVIE_ORIGINAL_TITLE, originalTitle);
-            movieValues.put(MOVIE_OVERVIEW, overview);
-            movieValues.put(MOVIE_RELEASE_DATE, releaseDate);
-
-            movies[i] = movieValues;
-        }
-        return movies;
-    }
-
+    // Parses JSON String and returns an Array of Bundle Movies.
     public static Bundle[] getMoviesBundlesFromJson(String json) throws JSONException {
 
         // Local Variable - Holds an Array of Movies.
