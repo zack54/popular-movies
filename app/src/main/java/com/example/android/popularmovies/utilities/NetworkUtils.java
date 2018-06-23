@@ -46,11 +46,6 @@ public final class NetworkUtils {
     private static final String API_KEY_PARAM = "api_key";
     private static final String API_KEY = BuildConfig.API_KEY;
 
-    // Return a Default Sort Criteria.
-    public static String getDefaultSortCriteria() {
-        return POPULAR_SORT_CRITERIA;
-    }
-
     // Builds the URL used to talk to the server using a API Key & a Sort Criteria.
     public static URL buildUrl(String pathToAppend, int movieId) {
         String stringUri = BASE_URL;

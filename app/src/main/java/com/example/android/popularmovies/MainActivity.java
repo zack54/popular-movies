@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
         if (savedInstanceState != null) {
             mCurrentSortCriteria = savedInstanceState.getString(NetworkUtils.CRITERIA_KEY);
         } else {
-            mCurrentSortCriteria = NetworkUtils.getDefaultSortCriteria();
+            mCurrentSortCriteria = NetworkUtils.POPULAR_SORT_CRITERIA;
         }
     }
 
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.OnC
 
 
     // Prepares the UI Before Network Starts.
-    public void onLoadStarted() {
+    private void onLoadStarted() {
         mMoviesAdapter.setmMovies(null, mCurrentSortCriteria);
         showData();
         mActivityMainBinding.mainLoadingIndicator.setVisibility(View.VISIBLE);

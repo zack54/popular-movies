@@ -39,10 +39,10 @@ import static com.example.android.popularmovies.data.FavoriteMoviesContract.Revi
 public class FavoriteMoviesContentProvider extends ContentProvider {
 
     // Constants - Define Integer Codes for a Table & for a Single Row, Used to match URIs.
-    public static final int MOVIES_CODE = 100;
-    public static final int MOVIE_WITH_ID_CODE = 101;
-    public static final int VIDEOS_CODE = 200;
-    public static final int REVIEWS_CODE = 300;
+    private static final int MOVIES_CODE = 100;
+    private static final int MOVIE_WITH_ID_CODE = 101;
+    private static final int VIDEOS_CODE = 200;
+    private static final int REVIEWS_CODE = 300;
 
     // Member Variable - Stores the URI Matcher.
     private static final UriMatcher sUriMatcher = buildUriMatcher();

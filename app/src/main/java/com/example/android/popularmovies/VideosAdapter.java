@@ -32,7 +32,7 @@ import android.widget.TextView;
 /**
  * Exposes a list of Videos - Plays Trailers.
  */
-public class VideosAdapter extends ArrayAdapter<String> {
+class VideosAdapter extends ArrayAdapter<String> {
 
     // Member Variable - Stores the List of Videos.
     private String[] mVideos;

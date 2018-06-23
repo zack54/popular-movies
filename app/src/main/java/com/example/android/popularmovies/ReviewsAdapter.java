@@ -32,7 +32,7 @@ import com.example.android.popularmovies.utilities.JsonUtils;
 /**
  * Exposes a list of Reviews.
  */
-public class ReviewsAdapter extends ArrayAdapter<ContentValues> {
+class ReviewsAdapter extends ArrayAdapter<ContentValues> {
 
     // Member Variable - Stores the List of Reviews.
     private ContentValues[] mReviews;
@@ -51,6 +51,7 @@ public class ReviewsAdapter extends ArrayAdapter<ContentValues> {
     }
 
     // Populates & Binds View with the correct Video's Link.
+    @SuppressWarnings("ConstantConditions")
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

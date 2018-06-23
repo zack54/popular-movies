@@ -384,6 +384,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
 
     // Handles Favorite Button Click events.
+    @SuppressWarnings("unused")
     public void favoriteButtonClickListener(View view) {
         if (mMovieIsFavorite) {
             deleteMovieFromFavorite();

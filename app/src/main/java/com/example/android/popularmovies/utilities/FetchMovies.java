@@ -37,7 +37,7 @@ public class FetchMovies extends AsyncTaskLoader<Bundle[]> {
     // Member Variable - Holds & Caches the Result of the load.
     private Bundle[] mMovies;
     @SuppressLint("StaticFieldLeak")
-    private Context mContext;
+    private final Context mContext;
     private final String mSortCriteria;
 
     // Public Constructor.

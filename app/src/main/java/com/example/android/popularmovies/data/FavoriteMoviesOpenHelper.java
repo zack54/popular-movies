@@ -25,7 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Defines & Updates the Favorite Movies Database's Schema.
  * Creates the Favorite Movies Database
  */
-public class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
+class FavoriteMoviesOpenHelper extends SQLiteOpenHelper {
 
     // Constant - Defines the Database's Name.
     private static final String DATABASE_NAME = "favorite_movies.db";
