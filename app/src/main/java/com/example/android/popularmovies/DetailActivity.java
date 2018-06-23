@@ -33,9 +33,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.data.FavoriteMoviesContract.Reviews;
@@ -107,11 +110,15 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     // Helper Method - Setups the ListViews' Adapters.
     private void setupListViews(Context context) {
+        RecyclerView detailVideo = findViewById(R.id.detail_videos);
+        detailVideo.setLayoutManager(new GridLayoutManager(this, 1));
+        detailVideo.setHasFixedSize(false);
         mVideosAdapter = new VideosAdapter(context);
-        mActivityDetailBinding.detailVideos.setAdapter(mVideosAdapter);
+        detailVideo.setAdapter(mVideosAdapter);
 
+        ListView detailReview = findViewById(R.id.detail_reviews);
         mReviewsAdapter = new ReviewsAdapter(context);
-        mActivityDetailBinding.detailReviews.setAdapter(mReviewsAdapter);
+        detailReview.setAdapter(mReviewsAdapter);
     }
 
 

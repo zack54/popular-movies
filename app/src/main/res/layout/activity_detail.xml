@@ -129,7 +129,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detail_overview" />
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/detail_videos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -137,12 +137,11 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
-                android:nestedScrollingEnabled="true"
+                android:scrollbars="vertical"
                 android:fadeScrollbars="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/detail_trailers_label"
-                tools:ignore="NestedScrolling" />
+                app:layout_constraintTop_toBottomOf="@+id/detail_trailers_label" />
 
             <TextView
                 android:id="@+id/detail_reviews_label"
@@ -179,7 +178,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label"
-                tools:ignore="NestedScrolling" />
+                tools:ignore="NestedScrolling"
+                tools:targetApi="lollipop" />
 
         </android.support.constraint.ConstraintLayout>
 

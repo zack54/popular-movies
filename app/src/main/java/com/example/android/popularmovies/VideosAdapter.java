@@ -21,18 +21,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
 /**
  * Exposes a list of Videos - Plays Trailers.
  */
-class VideosAdapter extends ArrayAdapter<String> {
+class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder> {
 
     // Member Variable - Stores the List of Videos.
     private String[] mVideos;
@@ -40,7 +39,6 @@ class VideosAdapter extends ArrayAdapter<String> {
 
     // Constructor - Initializes the List of Videos.
     VideosAdapter(Context context) {
-        super(context, -1);
         mContext = context;
     }
 
@@ -50,71 +48,73 @@ class VideosAdapter extends ArrayAdapter<String> {
         notifyDataSetChanged();
     }
 
-    // Populates & Binds View with the correct Video's Link.
+    // Initializes a ViewHolder using the Item's "XML" Layout.
     @NonNull
     @Override
-    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = null;
-        if (inflater != null) {
-            rowView = inflater.inflate(R.layout.detail_video_item, parent, false);
-
-            TextView view = rowView.findViewById(R.id.detail_video_number);
-            String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " + String.valueOf(position + 1);
-            view.setText(trailerNumber);
-            playTrailer(view, position);
-
-            Button button = rowView.findViewById(R.id.detail_share_button);
-            shareTrailerURL(button, position);
-        }
-        //noinspection ConstantConditions
-        return rowView;
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View itemView = inflater.inflate(R.layout.detail_video_item, parent, false);
+        return new ViewHolder(itemView);
     }
 
-    // Helper Method - Handles Click Events - Plays Video in Youtube App if exist, Otherwise in Browser App.
-    private void playTrailer(View view, final int position) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String videoId = mVideos[position];
-
-                Intent youtubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
-                youtubeIntent.putExtra("VIDEO_ID", videoId);
-                mContext.startActivity(youtubeIntent);
-            }
-        });
-    }
-
-    // Helper Method - Handles Click Events - Shares the Trailer's Youtube URL.
-    private void shareTrailerURL(TextView view, final int position) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String videoId = mVideos[position];
-                Uri uri = new Uri.Builder()
-                        .scheme("https")
-                        .authority("www.youtube.com")
-                        .appendPath("watch")
-                        .appendQueryParameter("v", videoId)
-                        .build();
-
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                        mContext.getString(R.string.detail_share_url_message_subject));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
-                mContext.startActivity(Intent.createChooser(shareIntent,
-                        mContext.getString(R.string.detail_share_url_chooser_title)));
-            }
-        });
+    // Populates & Binds the correct Video from Database/Cloud based on position & Sort Criteria.
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        TextView textView = holder.trailerTextView;
+        String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " + String.valueOf(position + 1);
+        textView.setText(trailerNumber);
     }
 
     // Returns the Total Number of Videos.
     @Override
-    public int getCount() {
+    public int getItemCount() {
         if (mVideos != null) return mVideos.length;
         return 0;
+    }
+
+    // Caches Views for Video item to be reused when needed.
+    class ViewHolder extends RecyclerView.ViewHolder {
+
+        // Holds references to Sub-View within a List Item View.
+        final TextView trailerTextView;
+        final Button shareButton;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            trailerTextView = itemView.findViewById(R.id.detail_video_number);
+            shareButton = itemView.findViewById(R.id.detail_share_button);
+
+            trailerTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String videoId = mVideos[getAdapterPosition()];
+                    Intent youtubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+                    youtubeIntent.putExtra("VIDEO_ID", videoId);
+                    mContext.startActivity(youtubeIntent);
+                }
+            });
+
+            shareButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String videoId = mVideos[getAdapterPosition()];
+                    Uri uri = new Uri.Builder()
+                            .scheme("https")
+                            .authority("www.youtube.com")
+                            .appendPath("watch")
+                            .appendQueryParameter("v", videoId)
+                            .build();
+
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                            mContext.getString(R.string.detail_share_url_message_subject));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
+                    mContext.startActivity(Intent.createChooser(shareIntent,
+                            mContext.getString(R.string.detail_share_url_chooser_title)));
+                }
+            });
+        }
     }
 }
