@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -59,25 +60,53 @@ public class VideosAdapter extends ArrayAdapter<String> {
         if (inflater != null) {
             rowView = inflater.inflate(R.layout.detail_video_item, parent, false);
 
-            TextView videoView = rowView.findViewById(R.id.detail_video_number);
+            TextView view = rowView.findViewById(R.id.detail_video_number);
             String trailerNumber = mContext.getString(R.string.detail_trailer_label) + " " + String.valueOf(position + 1);
-            videoView.setText(trailerNumber);
+            view.setText(trailerNumber);
+            playTrailer(view, position);
 
-            handleItemClickEvent(rowView, position);
+            Button button = rowView.findViewById(R.id.detail_share_button);
+            shareTrailerURL(button, position);
         }
         //noinspection ConstantConditions
         return rowView;
     }
 
     // Helper Method - Handles Click Events - Plays Video in Youtube App if exist, Otherwise in Browser App.
-    private void handleItemClickEvent(View rowView, final int position) {
-        rowView.setOnClickListener(new View.OnClickListener() {
+    private void playTrailer(View view, final int position) {
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String videoId = mVideos[position];
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
-                intent.putExtra("VIDEO_ID", videoId);
-                mContext.startActivity(intent);
+
+                Intent youtubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+                youtubeIntent.putExtra("VIDEO_ID", videoId);
+                mContext.startActivity(youtubeIntent);
+            }
+        });
+    }
+
+    // Helper Method - Handles Click Events - Shares the Trailer's Youtube URL.
+    private void shareTrailerURL(TextView view, final int position) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String videoId = mVideos[position];
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .authority("www.youtube.com")
+                        .appendPath("watch")
+                        .appendQueryParameter("v", videoId)
+                        .build();
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                        mContext.getString(R.string.detail_share_url_message_subject));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, uri.toString());
+                mContext.startActivity(Intent.createChooser(shareIntent,
+                        mContext.getString(R.string.detail_share_url_chooser_title)));
             }
         });
     }

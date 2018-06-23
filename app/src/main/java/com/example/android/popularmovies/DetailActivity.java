@@ -370,14 +370,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     // Helper Method - Displays the list of Videos.
     private void displayVideos(String[] videos) {
         mActivityDetailBinding.detailTrailersLabel.setText(String.format("(%s) %s",
-                String.valueOf(videos.length), mActivityDetailBinding.detailTrailersLabel.getText()));
+                String.valueOf(videos.length), getResources().getString(R.string.detail_trailers_label)));
         mVideosAdapter.setmVideos(videos);
     }
 
     // Helper Method - Displays the list of Reviews.
     private void displayReviews(ContentValues[] reviews) {
         mActivityDetailBinding.detailReviewsLabel.setText(String.format("(%s) %s",
-                String.valueOf(reviews.length), mActivityDetailBinding.detailReviewsLabel.getText()));
+                String.valueOf(reviews.length), getResources().getString(R.string.detail_reviews_label)));
         mReviewsAdapter.setmReviews(reviews);
     }
 

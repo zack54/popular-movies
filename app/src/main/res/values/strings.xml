@@ -34,6 +34,9 @@
     <string name="detail_play_icon">Play Icon</string>
     <string name="detail_add_to_favorite">Add To\nFavorite</string>
     <string name="detail_delete_from_favorite">Delete From\nFavorite</string>
+    <string name="detail_share_trailer">Share Trailer</string>
+    <string name="detail_share_url_chooser_title">Share The Trailer\'s URL!</string>
+    <string name="detail_share_url_message_subject">Trailer\'s Youtube URL</string>
 
     <string name="movie_poster">Movie Poster</string>
 
